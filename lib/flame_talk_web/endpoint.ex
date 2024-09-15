@@ -11,6 +11,10 @@ defmodule FlameTalkWeb.Endpoint do
     same_site: "Lax"
   ]
 
+  socket "/socket", FlameTalkWeb.UserSocket,
+  websocket: true,
+  longpoll: false
+
   socket "/live", Phoenix.LiveView.Socket,
     websocket: [connect_info: [session: @session_options]],
     longpoll: [connect_info: [session: @session_options]]
@@ -49,5 +53,10 @@ defmodule FlameTalkWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
+
+  if Mix.env() == :dev do
+    plug Plug.SSL, rewrite_on: [:x_forwarded_proto]
+  end
+
   plug FlameTalkWeb.Router
 end

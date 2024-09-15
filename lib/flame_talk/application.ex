@@ -17,7 +17,8 @@ defmodule FlameTalk.Application do
       # Start a worker by calling: FlameTalk.Worker.start_link(arg)
       # {FlameTalk.Worker, arg},
       # Start to serve requests, typically the last entry
-      FlameTalkWeb.Endpoint
+      FlameTalkWeb.Endpoint,
+      FlameTalkWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
