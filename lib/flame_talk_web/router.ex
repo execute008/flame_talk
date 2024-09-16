@@ -21,11 +21,13 @@ defmodule FlameTalkWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    live "/rooms", RoomListLive, :index
   end
 
   scope "/", FlameTalkWeb do
     pipe_through [:browser, :require_authenticated_user]
 
+    live "/rooms/new", RoomCreateLive, :new
     live "/rooms/:id", RoomLive, :show
   end
 

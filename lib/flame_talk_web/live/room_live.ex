@@ -1,25 +1,32 @@
 defmodule FlameTalkWeb.RoomLive do
   use FlameTalkWeb, :live_view
   alias FlameTalkWeb.Presence
+  alias FlameTalk.Rooms
 
   @impl true
   def mount(%{"id" => room_id}, session, socket) do
+    Process.flag(:trap_exit, true)
+
     topic = "room:" <> room_id
 
     if connected?(socket) do
       FlameTalkWeb.Endpoint.subscribe(topic)
+      Phoenix.PubSub.subscribe(FlameTalk.PubSub, "user_presence:#{room_id}")
     end
 
-    user_token =
+    user_id =
       session["user_token"]
       |> to_string()
-      |> Base.encode64()
+      |> Base.url_encode64(padding: false)
+
+    room = Rooms.get_room!(room_id)
 
     {:ok,
      assign(socket,
        room_id: room_id,
+       room: room,
        topic: topic,
-       user_id: user_token,
+       user_id: user_id,
        joined: false,
        users: [],
        fullscreen: false
@@ -28,35 +35,45 @@ defmodule FlameTalkWeb.RoomLive do
 
   @impl true
   def handle_event("join", _, socket) do
-    %{topic: topic, user_id: user_id} = socket.assigns
-    {:ok, _} = Presence.track(self(), topic, user_id, %{})
+    %{room: room, user_id: user_id, topic: topic} = socket.assigns
 
-    users = list_present_users(topic)
+    case Rooms.add_participant(room, user_id) do
+      {:ok, updated_room} ->
+        {:ok, _} = Presence.track(self(), topic, user_id, %{})
+        users = list_present_users(topic)
+        FlameTalkWeb.Endpoint.broadcast_from(self(), topic, "user_joined", %{user_id: user_id})
 
-    FlameTalkWeb.Endpoint.broadcast_from(self(), topic, "user_joined", %{user_id: user_id})
+        {:noreply,
+         socket
+         |> assign(joined: true, users: users, room: updated_room)
+         |> push_event("joined_room", %{users: users})}
 
-    {:noreply,
-     socket
-     |> assign(joined: true, users: users)
-     |> push_event("joined_room", %{users: users})}
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Failed to join the room")}
+    end
   end
 
   @impl true
   def handle_event("leave", _, socket) do
-    %{topic: topic, user_id: user_id} = socket.assigns
-    Presence.untrack(self(), topic, user_id)
-    FlameTalkWeb.Endpoint.broadcast(topic, "user_left", %{user_id: user_id})
-    {:noreply, assign(socket, joined: false, users: [])}
+    %{room: room, user_id: user_id, topic: topic} = socket.assigns
+
+    case Rooms.remove_participant(room, user_id) do
+      {:ok, updated_room} ->
+        Presence.untrack(self(), topic, user_id)
+        FlameTalkWeb.Endpoint.broadcast(topic, "user_left", %{user_id: user_id})
+        {:noreply, assign(socket, joined: false, users: [], room: updated_room)}
+
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Failed to leave the room")}
+    end
   end
 
   @impl true
   def handle_event("ready_to_connect", _, socket) do
     IO.puts("Received ready_to_connect event from #{socket.assigns.user_id}")
-
-    FlameTalkWeb.Endpoint.broadcast(socket.assigns.topic, "user_ready", %{
+    FlameTalkWeb.Endpoint.broadcast(socket.assigns.topic, "ready_to_connect", %{
       user_id: socket.assigns.user_id
     })
-
     {:noreply, socket}
   end
 
@@ -79,6 +96,12 @@ defmodule FlameTalkWeb.RoomLive do
   end
 
   @impl true
+  def handle_info(%Phoenix.Socket.Broadcast{event: "ready_to_connect", payload: %{user_id: user_id}}, socket) do
+    IO.puts("Received ready_to_connect broadcast for user: #{user_id}")
+    {:noreply, push_event(socket, "user_ready", %{user_id: user_id})}
+  end
+
+  @impl true
   def handle_info(%{event: "presence_diff"}, socket) do
     users = list_present_users(socket.assigns.topic)
     {:noreply, assign(socket, users: users)}
@@ -88,14 +111,24 @@ defmodule FlameTalkWeb.RoomLive do
   def handle_info(%{event: "user_joined", payload: %{user_id: user_id}}, socket) do
     IO.puts("Received user_joined event for #{user_id}")
     users = [user_id | socket.assigns.users] |> Enum.uniq()
-    {:noreply, socket |> assign(users: users) |> push_event("user_joined", %{user_id: user_id})}
+    updated_room = Rooms.get_room!(socket.assigns.room_id)
+
+    {:noreply,
+     socket
+     |> assign(users: users, room: updated_room)
+     |> push_event("user_joined", %{user_id: user_id})}
   end
 
   @impl true
   def handle_info(%{event: "user_left", payload: %{user_id: user_id}}, socket) do
     IO.puts("Received user_left event for #{user_id}")
     users = Enum.filter(socket.assigns.users, &(&1 != user_id))
-    {:noreply, socket |> assign(users: users) |> push_event("user_left", %{user_id: user_id})}
+    updated_room = Rooms.get_room!(socket.assigns.room_id)
+
+    {:noreply,
+     socket
+     |> assign(users: users, room: updated_room)
+     |> push_event("user_left", %{user_id: user_id})}
   end
 
   @impl true
@@ -116,6 +149,25 @@ defmodule FlameTalkWeb.RoomLive do
   end
 
   @impl true
+  def handle_info({:DOWN, _, :process, _, _}, socket) do
+    leave_room(socket)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def terminate(reason, socket) do
+    leave_room(socket)
+    {:noreply, socket}
+  end
+
+  defp leave_room(socket) do
+    %{room: room, user_id: user_id, topic: topic} = socket.assigns
+    Rooms.remove_participant(room, user_id)
+    Presence.untrack(self(), topic, user_id)
+    FlameTalkWeb.Endpoint.broadcast(topic, "user_left", %{user_id: user_id})
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
     <div
@@ -125,7 +177,7 @@ defmodule FlameTalkWeb.RoomLive do
       data-room-id={@room_id}
       data-user-id={@user_id}
     >
-      <h1 class="text-3xl font-bold mb-4"><%= @room_id %></h1>
+      <h1 class="text-3xl font-bold mb-4"><%= @room.name %></h1>
       <%= if @joined do %>
         <div id="video-container" class={if @fullscreen, do: "fullscreen", else: ""}>
           <div id="remote-videos" class={"grid gap-4 #{grid_class(length(@users) - 1)}"}>
@@ -216,12 +268,22 @@ defmodule FlameTalkWeb.RoomLive do
           </button>
         </div>
       <% else %>
-        <button
-          phx-click="join"
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Join Room
-        </button>
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+          <h2 class="text-2xl font-semibold mb-2"><%= @room.name %></h2>
+          <p class="text-gray-600 mb-4"><%= @room.description %></p>
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-sm text-gray-500">Category: <%= @room.category %></span>
+            <span class="text-sm text-gray-500">
+              Participants: <%= Rooms.get_participant_count(@room) %>
+            </span>
+          </div>
+          <button
+            phx-click="join"
+            class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+          >
+            Join Video
+          </button>
+        </div>
       <% end %>
     </div>
     """

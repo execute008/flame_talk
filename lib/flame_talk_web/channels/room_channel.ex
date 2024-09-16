@@ -16,7 +16,7 @@ defmodule FlameTalkWeb.RoomChannel do
   end
 
   @impl true
-  def handle_in("webrtc_signal", %{"signal" => signal, "to" => to}, socket) do
+  def handle_in("webrtc_signal", %{"signal" => signal, "to" => _to}, socket) do
     broadcast_from!(socket, "webrtc_signal", %{signal: signal, from: socket.assigns.user_id})
     {:noreply, socket}
   end
