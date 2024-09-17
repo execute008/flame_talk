@@ -16,7 +16,7 @@ const WebRTC = {
     this.handleEvent("user_joined", ({ user_id }) => {
       console.log("Received user_joined event for user:", user_id);
       if (user_id !== this.userId) {
-        this.connectToPeer(user_id);
+        this.connectToPeer(user_id, false); // Existing users wait for offers
       }
     });
 
@@ -31,17 +31,11 @@ const WebRTC = {
     });
 
     this.handleEvent("webrtc_signal", (payload) => {
-        console.log("Received webrtc_signal event:", payload);
-        this.handleSignal(payload);
-      });
-  
-      // Add this new event handler
-      this.handleEvent("ready_to_connect", ({ user_id }) => {
-        console.log("Received ready_to_connect event from:", user_id);
-        if (user_id !== this.userId) {
-          this.connectToPeer(user_id);
-        }
-      });
+      console.log("Received webrtc_signal event:", payload);
+      this.handleSignal(payload);
+    });
+
+    // Removed the 'ready_to_connect' event handler
 
     this.handleEvent("toggle_fullscreen", () => {
       this.toggleFullscreen();
@@ -57,30 +51,17 @@ const WebRTC = {
         console.log("Local stream obtained, connecting to peers");
         users.forEach((user_id) => {
           if (user_id !== this.userId) {
-            this.connectToPeer(user_id);
+            this.connectToPeer(user_id, true); // New user creates offers
           }
         });
-        this.pushEvent("ready_to_connect", { user_id: this.userId });
+        // Removed the 'ready_to_connect' broadcast
       })
       .catch((error) => {
         console.error("Error getting local stream:", error);
       });
   },
 
-  getLocalStream() {
-    console.log("Requesting local stream");
-    return navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((stream) => {
-        console.log("Got local stream");
-        this.localStream = stream;
-        const localVideo = document.getElementById("local-video");
-        localVideo.srcObject = stream;
-        return stream;
-      });
-  },
-
-  connectToPeer(peerId) {
+  connectToPeer(peerId, createOffer = false) {
     console.log(`Connecting to peer ${peerId}`);
     if (this.peers[peerId]) {
       console.log(`Peer connection exists for ${peerId}. Closing and recreating.`);
@@ -96,8 +77,7 @@ const WebRTC = {
       });
     }
 
-    // Only create offer if this peer is the "initiator" (has the lower user_id)
-    if (this.userId < peerId) {
+    if (createOffer) {
       this.createOffer(peer, peerId);
     }
   },
@@ -142,84 +122,81 @@ const WebRTC = {
       }
     };
 
-    peer.onnegotiationneeded = () => {
-      console.log(`Negotiation needed for ${peerId}`);
-      this.createOffer(peer, peerId);
-    };
+    // Removed 'onnegotiationneeded' handler
 
     return peer;
   },
-
+  
   createOffer(peer, peerId) {
     console.log(`Creating offer for ${peerId}`);
     peer
-      .createOffer()
-      .then((offer) => {
-        console.log(`Setting local description for ${peerId}`);
-        return peer.setLocalDescription(offer);
-      })
-      .then(() => {
-        console.log(`Sending offer to ${peerId}`);
-        this.pushEvent("webrtc_signal", {
-          to: peerId,
-          signal: { type: "offer", sdp: peer.localDescription },
-        });
-      })
-      .catch((error) => console.error("Error creating offer:", error));
+    .createOffer()
+    .then((offer) => {
+      console.log(`Setting local description for ${peerId}`);
+      return peer.setLocalDescription(offer);
+    })
+    .then(() => {
+      console.log(`Sending offer to ${peerId}`);
+      this.pushEvent("webrtc_signal", {
+        to: peerId,
+        signal: { type: "offer", sdp: peer.localDescription },
+      });
+    })
+    .catch((error) => console.error("Error creating offer:", error));
   },
-
+  
   handleSignal(payload) {
     const { from, signal } = payload;
     console.log(`Received signal from ${from}:`, signal);
-
+    
     let peer = this.peers[from];
     if (!peer) {
       console.log(`No existing peer for ${from}. Creating new connection.`);
       peer = this.createPeerConnection(from);
       this.peers[from] = peer;
     }
-
+    
     switch (signal.type) {
       case "offer":
         console.log(`Handling offer from ${from}`);
         peer.setRemoteDescription(new RTCSessionDescription(signal.sdp))
-          .then(() => {
-            console.log(`Creating answer for ${from}`);
-            return peer.createAnswer();
-          })
-          .then((answer) => {
-            console.log(`Setting local description (answer) for ${from}`);
-            return peer.setLocalDescription(answer);
-          })
-          .then(() => {
-            console.log(`Sending answer to ${from}`);
-            this.pushEvent("webrtc_signal", {
-              to: from,
-              signal: { type: "answer", sdp: peer.localDescription },
-            });
-            this.addBufferedIceCandidates(from);
-          })
-          .catch((error) => console.error("Error handling offer:", error));
+        .then(() => {
+          console.log(`Creating answer for ${from}`);
+          return peer.createAnswer();
+        })
+        .then((answer) => {
+          console.log(`Setting local description (answer) for ${from}`);
+          return peer.setLocalDescription(answer);
+        })
+        .then(() => {
+          console.log(`Sending answer to ${from}`);
+          this.pushEvent("webrtc_signal", {
+            to: from,
+            signal: { type: "answer", sdp: peer.localDescription },
+          });
+          this.addBufferedIceCandidates(from);
+        })
+        .catch((error) => console.error("Error handling offer:", error));
         break;
-      case "answer":
-        console.log(`Setting remote description (answer) for ${from}`);
-        peer
+        case "answer":
+          console.log(`Setting remote description (answer) for ${from}`);
+          peer
           .setRemoteDescription(new RTCSessionDescription(signal.sdp))
           .then(() => {
             this.addBufferedIceCandidates(from);
           })
           .catch((error) =>
             console.error("Error setting remote description:", error)
-          );
+        );
         break;
-      case "ice_candidate":
-        if (peer.remoteDescription && peer.remoteDescription.type) {
-          console.log(`Adding ICE candidate for ${from}`);
-          peer
+        case "ice_candidate":
+          if (peer.remoteDescription && peer.remoteDescription.type) {
+            console.log(`Adding ICE candidate for ${from}`);
+            peer
             .addIceCandidate(new RTCIceCandidate(signal.ice))
             .catch((error) =>
               console.error("Error adding ICE candidate:", error)
-            );
+          );
         } else {
           console.log(`Buffering ICE candidate for ${from}`);
           if (!this.iceCandidateBuffer[from]) {
@@ -228,24 +205,24 @@ const WebRTC = {
           this.iceCandidateBuffer[from].push(signal.ice);
         }
         break;
-    }
-  },
-
-  addBufferedIceCandidates(peerId) {
-    const peer = this.peers[peerId];
-    const bufferedCandidates = this.iceCandidateBuffer[peerId] || [];
-    bufferedCandidates.forEach((candidate) => {
-      console.log(`Adding buffered ICE candidate for ${peerId}`);
-      peer
+      }
+    },
+    
+    addBufferedIceCandidates(peerId) {
+      const peer = this.peers[peerId];
+      const bufferedCandidates = this.iceCandidateBuffer[peerId] || [];
+      bufferedCandidates.forEach((candidate) => {
+        console.log(`Adding buffered ICE candidate for ${peerId}`);
+        peer
         .addIceCandidate(new RTCIceCandidate(candidate))
         .catch((error) =>
           console.error("Error adding buffered ICE candidate:", error)
-        );
+      );
     });
     // Clear the buffer
     this.iceCandidateBuffer[peerId] = [];
   },
-
+  
   removePeer(peerId) {
     console.log(`Removing peer ${peerId}`);
     if (this.peers[peerId]) {
@@ -257,7 +234,7 @@ const WebRTC = {
       this.peers[peerId].onsignalingstatechange = null;
       this.peers[peerId].onicegatheringstatechange = null;
       this.peers[peerId].onnegotiationneeded = null;
-  
+      
       this.peers[peerId].close();
       delete this.peers[peerId];
     }
@@ -267,7 +244,7 @@ const WebRTC = {
     }
     delete this.iceCandidateBuffer[peerId];
   },
-
+  
   toggleFullscreen() {
     const container = document.getElementById("video-container");
     if (!document.fullscreenElement) {
@@ -293,25 +270,25 @@ const WebRTC = {
     }
     this.resizeVideos();
   },
-
+  
   resizeVideos() {
     const remoteVideosContainer = document.getElementById("remote-videos");
     const remoteVideos = remoteVideosContainer.querySelectorAll(
       ".video-aspect-ratio"
     );
     const isFullscreen = !!document.fullscreenElement;
-
+    
     if (isFullscreen) {
       const containerWidth = window.innerWidth;
       const containerHeight = window.innerHeight;
       const videoCount = remoteVideos.length;
-
+      
       let columns = Math.ceil(Math.sqrt(videoCount));
       let rows = Math.ceil(videoCount / columns);
-
+      
       let videoWidth = Math.floor(containerWidth / columns);
       let videoHeight = Math.floor(containerHeight / rows);
-
+      
       remoteVideos.forEach((videoContainer) => {
         videoContainer.style.width = `${videoWidth}px`;
         videoContainer.style.height = `${videoHeight}px`;
@@ -324,6 +301,19 @@ const WebRTC = {
         videoContainer.style.paddingBottom = "56.25%";
       });
     }
+  },
+  
+  getLocalStream() {
+    console.log("Requesting local stream");
+    return navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((stream) => {
+        console.log("Got local stream");
+        this.localStream = stream;
+        const localVideo = document.getElementById("local-video");
+        localVideo.srcObject = stream;
+        return stream;
+      });
   },
 
   addRemoteStream(peerId, stream) {

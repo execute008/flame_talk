@@ -96,9 +96,10 @@ defmodule FlameTalkWeb.RoomLive do
   end
 
   @impl true
+  @impl true
   def handle_info(%Phoenix.Socket.Broadcast{event: "ready_to_connect", payload: %{user_id: user_id}}, socket) do
     IO.puts("Received ready_to_connect broadcast for user: #{user_id}")
-    {:noreply, push_event(socket, "user_ready", %{user_id: user_id})}
+    {:noreply, push_event(socket, "ready_to_connect", %{user_id: user_id})}
   end
 
   @impl true
