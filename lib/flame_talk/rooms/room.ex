@@ -13,7 +13,7 @@ defmodule FlameTalk.Rooms.Room do
 
   def changeset(room, attrs) do
     room
-    |> cast(attrs, [:name, :description, :category, :participant_count])
+    |> cast(attrs, [:name, :description, :category])
     |> validate_required([:name, :category])
   end
 end
