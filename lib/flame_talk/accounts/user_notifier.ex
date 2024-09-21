@@ -8,7 +8,7 @@ defmodule FlameTalk.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"FlameTalk", "contact@example.com"})
+      |> from({"FlameTalk by AXIIS", "axiis@axiis.art"})
       |> subject(subject)
       |> text_body(body)
 
