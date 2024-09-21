@@ -8,14 +8,9 @@ import Config
 config :flame_talk, FlameTalkWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json"
 
-config :flame_talk, FlameTalk.Mailer,
-  adapter: Swoosh.Adapters.Sendgrid,
-  api_key: System.get_env("SENDGRID_API_KEY"),
-  finch_name: FlameTalk.Finch
 
-
-  Copy
-  config :swoosh, :api_client, {Swoosh.ApiClient.Finch, [finch_name: FlameTalk.Finch]}
+# Configures Swoosh API Client
+config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: FlameTalk.Finch
 
 # Disable Swoosh Local Memory Storage
 config :swoosh, local: false
