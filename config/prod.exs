@@ -13,7 +13,9 @@ config :flame_talk, FlameTalk.Mailer,
   api_key: System.get_env("SENDGRID_API_KEY"),
   finch_name: FlameTalk.Finch
 
-config :swoosh, :api_client, Swoosh.ApiClient.Finch
+
+  Copy
+  config :swoosh, :api_client, {Swoosh.ApiClient.Finch, [finch_name: FlameTalk.Finch]}
 
 # Disable Swoosh Local Memory Storage
 config :swoosh, local: false
