@@ -13,6 +13,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      inset: {
+        'safe-top': 'env(safe-area-inset-top)',
+        'safe-bottom': 'env(safe-area-inset-bottom)',
+      },
       colors: {
         brand: "#FD4F00",
       }

@@ -181,13 +181,12 @@ defmodule FlameTalkWeb.RoomLive do
     <div
       class="container mx-auto px-4 py-8"
       id="room"
-      phx-hook="WebRTC"
       data-room-id={@room_id}
       data-user-id={@user_id}
     >
       <h1 class="text-3xl font-bold mb-4"><%= @room.name %></h1>
       <%= if @joined do %>
-        <div id="video-container" class={if @fullscreen, do: "fullscreen", else: ""}>
+        <div id="video-container" phx-hook="WebRTC" class={if @fullscreen, do: "fullscreen", else: ""}>
           <div id="remote-videos" class={"grid gap-4 #{grid_class(length(@users) - 1)}"}>
             <%= for user_id <- @users do %>
               <%= if user_id != @user_id do %>
@@ -222,20 +221,7 @@ defmodule FlameTalkWeb.RoomLive do
             class="absolute top-4 left-4 z-10 bg-red-500 hover:bg-red-700 text-white p-2 rounded-full shadow-lg"
             title="Leave Room"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-              />
-            </svg>
+          <Icons.exit_room_icon />
           </button>
           <button
             phx-click="toggle_fullscreen"

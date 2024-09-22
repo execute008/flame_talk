@@ -4,6 +4,7 @@ defmodule YourAppWeb.Components.Icons do
   @doc "Fullscreen icon"
   def fullscreen_icon(assigns) do
     assigns = assign_new(assigns, :class, fn -> "h-6 w-6" end)
+
     ~H"""
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -27,6 +28,7 @@ defmodule YourAppWeb.Components.Icons do
   @doc "Exit fullscreen icon"
   def exit_fullscreen_icon(assigns) do
     assigns = assign_new(assigns, :class, fn -> "h-6 w-6" end)
+
     ~H"""
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -43,6 +45,27 @@ defmodule YourAppWeb.Components.Icons do
            M9 15v4.5M9 15H4.5M9 15l-5.25 5.25
            M15 9h4.5M15 9V4.5M15 9l5.25-5.25
            M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"
+      />
+    </svg>
+    """
+  end
+
+  def exit_room_icon(assigns) do
+    assigns = assign_new(assigns, :class, fn -> "h-6 w-6" end)
+
+    ~H"""
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
       />
     </svg>
     """
