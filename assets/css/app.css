@@ -142,6 +142,12 @@ html, body {
   transition: all 0.3s ease-in-out;
 }
 
+.emoji-around-compliment {
+  position: fixed;
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
+}
+
 /* Emoji particles */
 .emoji-particle {
   position: fixed;

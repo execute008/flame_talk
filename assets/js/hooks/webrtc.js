@@ -1,4 +1,4 @@
-import { complimnets } from '../data/compliments';
+import { complimnets } from "../data/compliments";
 
 const WebRTC = {
   mounted() {
@@ -43,23 +43,22 @@ const WebRTC = {
       this.toggleFullscreen();
     });
 
-
-    this.viewingMode = 'remote';
+    this.viewingMode = "remote";
 
     // Get references to the video containers
-    this.localVideoContainer = document.getElementById('local-video-container');
-    this.remoteVideosContainer = document.getElementById('remote-videos');
+    this.localVideoContainer = document.getElementById("local-video-container");
+    this.remoteVideosContainer = document.getElementById("remote-videos");
 
     // Add click listener to local video container
-    this.localVideoContainer.addEventListener('click', () => this.toggleViewingMode());
+    this.localVideoContainer.addEventListener("click", () =>
+      this.toggleViewingMode()
+    );
 
     // Create the switch-back button but don't add it yet
     this.createSwitchBackButton();
 
     window.addEventListener("resize", () => this.resizeVideos());
   },
-
-
 
   // WebRTC methods
 
@@ -83,7 +82,9 @@ const WebRTC = {
   connectToPeer(peerId, createOffer = false) {
     console.log(`Connecting to peer ${peerId}`);
     if (this.peers[peerId]) {
-      console.log(`Peer connection exists for ${peerId}. Closing and recreating.`);
+      console.log(
+        `Peer connection exists for ${peerId}. Closing and recreating.`
+      );
       this.peers[peerId].close();
       delete this.peers[peerId];
     }
@@ -145,77 +146,78 @@ const WebRTC = {
 
     return peer;
   },
-  
+
   createOffer(peer, peerId) {
     console.log(`Creating offer for ${peerId}`);
     peer
-    .createOffer()
-    .then((offer) => {
-      console.log(`Setting local description for ${peerId}`);
-      return peer.setLocalDescription(offer);
-    })
-    .then(() => {
-      console.log(`Sending offer to ${peerId}`);
-      this.pushEvent("webrtc_signal", {
-        to: peerId,
-        signal: { type: "offer", sdp: peer.localDescription },
-      });
-    })
-    .catch((error) => console.error("Error creating offer:", error));
+      .createOffer()
+      .then((offer) => {
+        console.log(`Setting local description for ${peerId}`);
+        return peer.setLocalDescription(offer);
+      })
+      .then(() => {
+        console.log(`Sending offer to ${peerId}`);
+        this.pushEvent("webrtc_signal", {
+          to: peerId,
+          signal: { type: "offer", sdp: peer.localDescription },
+        });
+      })
+      .catch((error) => console.error("Error creating offer:", error));
   },
-  
+
   handleSignal(payload) {
     const { from, signal } = payload;
     console.log(`Received signal from ${from}:`, signal);
-    
+
     let peer = this.peers[from];
     if (!peer) {
       console.log(`No existing peer for ${from}. Creating new connection.`);
       peer = this.createPeerConnection(from);
       this.peers[from] = peer;
     }
-    
+
     switch (signal.type) {
       case "offer":
         console.log(`Handling offer from ${from}`);
-        peer.setRemoteDescription(new RTCSessionDescription(signal.sdp))
-        .then(() => {
-          console.log(`Creating answer for ${from}`);
-          return peer.createAnswer();
-        })
-        .then((answer) => {
-          console.log(`Setting local description (answer) for ${from}`);
-          return peer.setLocalDescription(answer);
-        })
-        .then(() => {
-          console.log(`Sending answer to ${from}`);
-          this.pushEvent("webrtc_signal", {
-            to: from,
-            signal: { type: "answer", sdp: peer.localDescription },
-          });
-          this.addBufferedIceCandidates(from);
-        })
-        .catch((error) => console.error("Error handling offer:", error));
+        peer
+          .setRemoteDescription(new RTCSessionDescription(signal.sdp))
+          .then(() => {
+            console.log(`Creating answer for ${from}`);
+            return peer.createAnswer();
+          })
+          .then((answer) => {
+            console.log(`Setting local description (answer) for ${from}`);
+            return peer.setLocalDescription(answer);
+          })
+          .then(() => {
+            console.log(`Sending answer to ${from}`);
+            this.pushEvent("webrtc_signal", {
+              to: from,
+              signal: { type: "answer", sdp: peer.localDescription },
+            });
+            this.addBufferedIceCandidates(from);
+          })
+          .catch((error) => console.error("Error handling offer:", error));
         break;
-        case "answer":
-          console.log(`Setting remote description (answer) for ${from}`);
-          peer
+      case "answer":
+        console.log(`Setting remote description (answer) for ${from}`);
+        peer
           .setRemoteDescription(new RTCSessionDescription(signal.sdp))
           .then(() => {
             this.addBufferedIceCandidates(from);
           })
           .catch((error) =>
             console.error("Error setting remote description:", error)
-        );
+          );
         break;
-        case "ice_candidate":
-          if (peer.remoteDescription && peer.remoteDescription.type) {
-            console.log(`Adding ICE candidate for ${from}`);
-            peer
+      case "ice_candidate":
+        if (peer.remoteDescription && peer.remoteDescription.type) {
+          console.log(`Adding ICE candidate for ${from}`);
+          peer
             .addIceCandidate(new RTCIceCandidate(signal.ice))
             .catch((error) =>
               console.error("Error adding ICE candidate:", error)
-          );
+            );
         } else {
           console.log(`Buffering ICE candidate for ${from}`);
           if (!this.iceCandidateBuffer[from]) {
@@ -224,24 +226,24 @@ const WebRTC = {
           this.iceCandidateBuffer[from].push(signal.ice);
         }
         break;
-      }
-    },
-    
-    addBufferedIceCandidates(peerId) {
-      const peer = this.peers[peerId];
-      const bufferedCandidates = this.iceCandidateBuffer[peerId] || [];
-      bufferedCandidates.forEach((candidate) => {
-        console.log(`Adding buffered ICE candidate for ${peerId}`);
-        peer
+    }
+  },
+
+  addBufferedIceCandidates(peerId) {
+    const peer = this.peers[peerId];
+    const bufferedCandidates = this.iceCandidateBuffer[peerId] || [];
+    bufferedCandidates.forEach((candidate) => {
+      console.log(`Adding buffered ICE candidate for ${peerId}`);
+      peer
         .addIceCandidate(new RTCIceCandidate(candidate))
         .catch((error) =>
           console.error("Error adding buffered ICE candidate:", error)
-      );
+        );
     });
     // Clear the buffer
     this.iceCandidateBuffer[peerId] = [];
   },
-  
+
   removePeer(peerId) {
     console.log(`Removing peer ${peerId}`);
     if (this.peers[peerId]) {
@@ -253,7 +255,7 @@ const WebRTC = {
       this.peers[peerId].onsignalingstatechange = null;
       this.peers[peerId].onicegatheringstatechange = null;
       this.peers[peerId].onnegotiationneeded = null;
-      
+
       this.peers[peerId].close();
       delete this.peers[peerId];
     }
@@ -263,7 +265,7 @@ const WebRTC = {
     }
     delete this.iceCandidateBuffer[peerId];
   },
-  
+
   toggleFullscreen() {
     const container = document.getElementById("video-container");
     if (!document.fullscreenElement) {
@@ -289,25 +291,25 @@ const WebRTC = {
     }
     this.resizeVideos();
   },
-  
+
   resizeVideos() {
     const remoteVideosContainer = document.getElementById("remote-videos");
     const remoteVideos = remoteVideosContainer.querySelectorAll(
       ".video-aspect-ratio"
     );
     const isFullscreen = !!document.fullscreenElement;
-    
+
     if (isFullscreen) {
       const containerWidth = window.innerWidth;
       const containerHeight = window.innerHeight;
       const videoCount = remoteVideos.length;
-      
+
       let columns = Math.ceil(Math.sqrt(videoCount));
       let rows = Math.ceil(videoCount / columns);
-      
+
       let videoWidth = Math.floor(containerWidth / columns);
       let videoHeight = Math.floor(containerHeight / rows);
-      
+
       remoteVideos.forEach((videoContainer) => {
         videoContainer.style.width = `${videoWidth}px`;
         videoContainer.style.height = `${videoHeight}px`;
@@ -321,7 +323,7 @@ const WebRTC = {
       });
     }
   },
-  
+
   getLocalStream() {
     console.log("Requesting local stream");
     return navigator.mediaDevices
@@ -356,208 +358,255 @@ const WebRTC = {
   },
 
   toggleViewingMode() {
-    if (this.viewingMode === 'remote') {
+    if (this.viewingMode === "remote") {
       this.showLocalVideoFullScreen();
     } else {
       this.showRemoteVideos();
     }
   },
 
-
   // EMOJI PARTY
 
   emojis: ["🎉", "💥", "✨", "🔥", "🌟", "🎊", "🍾", "😃", "🥳", "😎", "🌈"],
-  
+
   compliments: complimnets,
 
-  // ... existing methods ...
-
-  emojiExplosion() {
-    // Select three random emojis
-    const explosionEmojis = [];
-    const emojisCopy = [...this.emojis];
-    for (let i = 0; i < 3; i++) {
-      const index = Math.floor(Math.random() * emojisCopy.length);
-      explosionEmojis.push(emojisCopy.splice(index, 1)[0]);
-    }
-
-    // Define the corners
-    const corners = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
-
-    const particles = [];
-    explosionEmojis.forEach((emoji) => {
-      for (let i = 0; i < 33; i++) {
-        // Assign each particle to a corner
-        const corner = corners[i % corners.length];
-        particles.push(this.createEmojiParticle(emoji, corner));
-      }
-    });
-
-    // Animate particles
-    particles.forEach((particle) => {
-      document.body.appendChild(particle);
-      this.animateParticle(particle);
-    });
-  },
-
-  createEmojiParticle(emoji, corner) {
-    const particle = document.createElement('div');
-    particle.className = 'emoji-particle';
-    particle.textContent = emoji;
-    particle.style.position = 'fixed';
-    particle.style.zIndex = '100';
-    particle.style.left = '50%';
-    particle.style.top = '50%';
-    particle.style.fontSize = `${16 + Math.random() * 32}px`; // Random size between 16px and 48px
-    particle.style.pointerEvents = 'none';
-    particle.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 360}deg)`;
-    particle.dataset.corner = corner; // Store the corner in a data attribute
-    return particle;
-  },
-
-  animateParticle(particle) {
-    const corner = particle.dataset.corner;
-
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
-    let xMultiplier = 0;
-    let yMultiplier = 0;
-
-    // Set direction multipliers based on the corner
-    switch (corner) {
-      case 'top-left':
-        xMultiplier = -1;
-        yMultiplier = -1;
-        break;
-      case 'top-right':
-        xMultiplier = 1;
-        yMultiplier = -1;
-        break;
-      case 'bottom-left':
-        xMultiplier = -1;
-        yMultiplier = 1;
-        break;
-      case 'bottom-right':
-        xMultiplier = 1;
-        yMultiplier = 1;
-        break;
-    }
-
-    // Random offsets to spread particles within the corner area
-    const randX = Math.random() * width / 2;
-    const randY = Math.random() * height / 2;
-
-    const xOffset = xMultiplier * randX;
-    const yOffset = yMultiplier * randY;
-
-    const duration = 1000 + Math.random() * 1000;
-  
-    const animation = particle.animate([
-      {
-        transform: `translate(-50%, -50%) translate(0, 0) scale(1) rotate(${Math.random() * 360}deg)`,
-        opacity: 1,
-      },
-      {
-        transform: `translate(-50%, -50%) translate(${xOffset}px, ${yOffset}px) scale(0) rotate(${Math.random() * 360}deg)`,
-        opacity: 0,
-      }
-    ], {
-      duration: duration,
-      easing: 'ease-out',
-    });
-
-    animation.onfinish = () => {
-      particle.remove();
-    };
-  },
+  emojisAroundCompliment: [],
 
   showRandomCompliment() {
     // Select a random compliment
-    const compliment = this.compliments[Math.floor(Math.random() * this.compliments.length)];
-  
+    const compliment =
+      this.compliments[Math.floor(Math.random() * this.compliments.length)];
+
     // Create the compliment container
-    const complimentContainer = document.createElement('div');
-    complimentContainer.className = 'compliment-container';
-    complimentContainer.style.position = 'fixed';
-    complimentContainer.style.top = '50%';
-    complimentContainer.style.left = '50%';
-    complimentContainer.style.transform = 'translate(-50%, -50%)';
-    complimentContainer.style.zIndex = '100';
-    complimentContainer.style.background = 'rgba(0, 0, 0, 0.7)';
-    complimentContainer.style.color = 'white';
-    complimentContainer.style.padding = '20px';
-    complimentContainer.style.borderRadius = '10px';
-    complimentContainer.style.display = 'flex';
-    complimentContainer.style.flexDirection = 'column';
-    complimentContainer.style.alignItems = 'center';
-    complimentContainer.style.fontSize = '24px';
-    complimentContainer.style.textAlign = 'center';
-  
+    const complimentContainer = document.createElement("div");
+    complimentContainer.className = "compliment-container";
+    // Set styles for the compliment container
+    complimentContainer.style.position = "fixed";
+    complimentContainer.style.top = "50%";
+    complimentContainer.style.left = "50%";
+    complimentContainer.style.transform = "translate(-50%, -50%)";
+    complimentContainer.style.zIndex = "100";
+    complimentContainer.style.background = "rgba(0, 0, 0, 0.7)";
+    complimentContainer.style.color = "white";
+    complimentContainer.style.padding = "20px";
+    complimentContainer.style.borderRadius = "10px";
+    complimentContainer.style.display = "flex";
+    complimentContainer.style.flexDirection = "column";
+    complimentContainer.style.alignItems = "center";
+    complimentContainer.style.fontSize = "24px";
+    complimentContainer.style.textAlign = "center";
+
     // Compliment text
-    const message = document.createElement('div');
+    const message = document.createElement("div");
     message.textContent = compliment.message;
     complimentContainer.appendChild(message);
-  
-    // Compliment emojis
-    const emojisDiv = document.createElement('div');
-    emojisDiv.textContent = compliment.emojis.join(' ');
-    emojisDiv.style.marginTop = '10px';
-    complimentContainer.appendChild(emojisDiv);
-  
+
     document.body.appendChild(complimentContainer);
-  
+
+    // Create emojis around the compliment
+    this.createEmojisAroundCompliment(complimentContainer, compliment.emojis);
+
+    // Adjust the duration to accommodate emoji appearance
+    const numEmojis = 100;
+    const totalDuration = 2000;
+    const complimentDuration = totalDuration + 2000; // Extra time for explosion and viewing
+
     // Animate the compliment (fade in and out)
-    complimentContainer.animate([
-      { opacity: 0 },
-      { opacity: 1 },
-      { opacity: 1, offset: 0.8 },
-      { opacity: 0 }
-    ], {
-      duration: 4000,
-      easing: 'ease-in-out',
-    }).onfinish = () => {
+    complimentContainer.animate(
+      [
+        { opacity: 0 },
+        { opacity: 1 },
+        { opacity: 1, offset: 0.8 },
+        { opacity: 0 },
+      ],
+      {
+        duration: complimentDuration,
+        easing: "ease-in-out",
+      }
+    ).onfinish = () => {
       complimentContainer.remove();
     };
   },
 
+  createEmojisAroundCompliment(complimentContainer, emojis) {
+    this.emojisAroundCompliment = []; // Store references to emoji elements
+  
+    const numEmojis = 99; // Total number of emojis
+    const totalDuration = 2000; // Total time to add all emojis (in milliseconds)
+    const delayBetweenEmojis = totalDuration / numEmojis;
+  
+    // Get the compliment container's bounding rectangle
+    const rect = complimentContainer.getBoundingClientRect();
+  
+    // Define the larger rectangle around the compliment container
+    const padding = 20; // Reduced padding to bring emojis closer
+    const left = rect.left - padding;
+    const right = rect.right + padding;
+    const top = rect.top - padding;
+    const bottom = rect.bottom + padding;
+  
+    // Calculate the width and height of the larger rectangle
+    const width = right - left;
+    const height = bottom - top;
+  
+    // Calculate the perimeter of the larger rectangle
+    const perimeter = 2 * (width + height);
+  
+    for (let i = 0; i < numEmojis; i++) {
+      setTimeout(() => {
+        const emojiChar = emojis[i % emojis.length];
+        const emojiElement = document.createElement('div');
+        emojiElement.className = 'emoji-around-compliment';
+        emojiElement.textContent = emojiChar;
+        emojiElement.style.position = 'fixed';
+        emojiElement.style.zIndex = '99';
+        emojiElement.style.fontSize = `${24 + Math.random() * 16}px`; // Random size between 24px and 40px
+        emojiElement.style.pointerEvents = 'none';
+        emojiElement.style.userSelect = 'none';
+        emojiElement.style.opacity = '0';
+  
+        // Randomly pick a distance along the perimeter
+        const distance = Math.random() * perimeter;
+  
+        let x, y;
+  
+        if (distance < width) {
+          // Top edge
+          x = left + distance;
+          y = top;
+        } else if (distance < width + height) {
+          // Right edge
+          x = right;
+          y = top + (distance - width);
+        } else if (distance < 2 * width + height) {
+          // Bottom edge
+          x = right - (distance - width - height);
+          y = bottom;
+        } else {
+          // Left edge
+          x = left;
+          y = bottom - (distance - 2 * width - height);
+        }
+  
+        // Add slight random offset to avoid perfect alignment
+        const offset = 5; // Reduced offset to keep emojis closer
+        x += (Math.random() - 0.5) * offset * 2;
+        y += (Math.random() - 0.5) * offset * 2;
+  
+        // Position the emoji
+        emojiElement.style.left = `${x}px`;
+        emojiElement.style.top = `${y}px`;
+        emojiElement.style.transform = 'translate(-50%, -50%)';
+  
+        document.body.appendChild(emojiElement);
+        this.emojisAroundCompliment.push(emojiElement);
+  
+        // Fade in the emoji
+        emojiElement.animate(
+          [
+            { opacity: 0 },
+            { opacity: 1 }
+          ],
+          {
+            duration: 300,
+            easing: 'ease-in',
+            fill: 'forwards' // Retain the final state
+          }
+        );
+      }, i * delayBetweenEmojis);
+    }
+  
+    // After all emojis have been added, trigger the explosion
+    const totalAnimationTime = numEmojis * delayBetweenEmojis;
+    setTimeout(() => {
+      this.explodeEmojis();
+    }, totalAnimationTime + 500); // Add a slight delay before explosion
+  },
+
+  explodeEmojis() {
+    // Animate each emoji to move outward and fade out
+    this.emojisAroundCompliment.forEach((emojiElement) => {
+      const rect = emojiElement.getBoundingClientRect();
+      const startX = rect.left + rect.width / 2;
+      const startY = rect.top + rect.height / 2;
+  
+      // Calculate the angle from the center of the screen to the emoji
+      const angle = Math.atan2(startY - window.innerHeight / 2, startX - window.innerWidth / 2);
+  
+      // Randomize explosion distance
+      const maxDistance = Math.max(window.innerWidth, window.innerHeight) * 0.8;
+      const minDistance = maxDistance * 0.5; // Minimum distance is 50% of max
+      const distance = minDistance + Math.random() * (maxDistance - minDistance);
+  
+      // Calculate end positions with random distance
+      const endX = startX + Math.cos(angle) * distance;
+      const endY = startY + Math.sin(angle) * distance;
+  
+      // Randomize animation duration for explosion speed
+      const minDuration = 800; // Minimum duration in ms
+      const maxDuration = 1500; // Maximum duration in ms
+      const duration = minDuration + Math.random() * (maxDuration - minDuration);
+  
+      const animation = emojiElement.animate([
+        {
+          transform: `translate(-50%, -50%)`,
+          opacity: 1,
+        },
+        {
+          transform: `translate(${endX - startX}px, ${endY - startY}px)`,
+          opacity: 0,
+        }
+      ], {
+        duration: duration,
+        easing: 'ease-out',
+      });
+  
+      animation.onfinish = () => {
+        emojiElement.remove();
+      };
+    });
+  
+    // Clear the array after animation
+    this.emojisAroundCompliment = [];
+  },
 
   showLocalVideoFullScreen() {
-    this.viewingMode = 'local';
+    this.viewingMode = "local";
 
     // Add 'fullscreen' class to local video container
-    this.localVideoContainer.classList.add('fullscreen');
+    this.localVideoContainer.classList.add("fullscreen");
     // Hide remote videos
-    this.remoteVideosContainer.classList.add('hidden');
+    this.remoteVideosContainer.classList.add("hidden");
     // Add switch-back button
     this.localVideoContainer.appendChild(this.switchBackButton);
 
     // Remove cursor pointer
-    this.localVideoContainer.classList.remove('cursor-pointer');
+    this.localVideoContainer.classList.remove("cursor-pointer");
 
-    this.emojiExplosion();
     this.showRandomCompliment();
   },
 
   showRemoteVideos() {
-    this.viewingMode = 'remote';
+    this.viewingMode = "remote";
 
     // Remove 'fullscreen' class from local video container
-    this.localVideoContainer.classList.remove('fullscreen');
+    this.localVideoContainer.classList.remove("fullscreen");
     // Show remote videos
-    this.remoteVideosContainer.classList.remove('hidden');
+    this.remoteVideosContainer.classList.remove("hidden");
     // Remove switch-back button
     this.switchBackButton.remove();
 
     // Add cursor pointer back
-    this.localVideoContainer.classList.add('cursor-pointer');
+    this.localVideoContainer.classList.add("cursor-pointer");
   },
 
   createSwitchBackButton() {
     // Create a button to switch back to remote view
-    this.switchBackButton = document.createElement('button');
-    this.switchBackButton.className = 'absolute top-4 left-4 z-10 bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg';
-    this.switchBackButton.title = 'Switch to Remote View';
+    this.switchBackButton = document.createElement("button");
+    this.switchBackButton.className =
+      "absolute top-4 left-4 z-10 bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg";
+    this.switchBackButton.title = "Switch to Remote View";
 
     // Add icon inside the button (replace with your icon)
     this.switchBackButton.innerHTML = `
@@ -569,7 +618,7 @@ const WebRTC = {
     `;
 
     // Add click listener to the switch-back button
-    this.switchBackButton.addEventListener('click', (event) => {
+    this.switchBackButton.addEventListener("click", (event) => {
       event.stopPropagation(); // Prevent click from propagating to the local video container
       this.toggleViewingMode();
     });
@@ -580,9 +629,12 @@ const WebRTC = {
     Object.keys(this.peers).forEach((peerId) => this.removePeer(peerId));
     this.peers = {};
     this.iceCandidateBuffer = {};
-    this.localVideoContainer.removeEventListener('click', this.toggleViewingMode);
-    this.switchBackButton.removeEventListener('click', this.toggleViewingMode);
-  }
+    this.localVideoContainer.removeEventListener(
+      "click",
+      this.toggleViewingMode
+    );
+    this.switchBackButton.removeEventListener("click", this.toggleViewingMode);
+  },
 };
 
 export default WebRTC;
