@@ -93,20 +93,22 @@ html, body {
   }
 
   /* Local video in default (small) mode */
-#local-video-container {
-  position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-  width: 25%;
-  max-width: 200px;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-}
-
-#local-video-container video {
-  border-radius: 0.5rem;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
+  #local-video-container {
+    position: fixed;
+    right: 1rem;
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    width: 25%;
+    max-width: 200px;
+    z-index: 50;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  #local-video-container video {
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  }
 
 /* Local video in full-screen mode */
 #local-video-container.fullscreen {
