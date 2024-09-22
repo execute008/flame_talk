@@ -1,0 +1,42 @@
+defmodule FlameTalkWeb.HomeLive do
+  use FlameTalkWeb, :live_view
+  use FlameTalkNative, :live_view
+
+  def mount(_params, _session, socket) do
+    {:ok, socket, layout: false}
+  end
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <section class="phx-hero bg-gradient-to-t to-white from-10% via-amber-500 via-30% from-red-500 to-90% h-screen w-full">
+      <div class="flex items-center justify-center gap-4">
+        <img src={~p"/images/logo.png"} alt="FlameTalk Logo" class="w-32 justify-center" />
+        <div class="flex flex-col justify-center items-center">
+          <h1 class="text-4xl">
+            Welcome to
+            <span class="bg-gradient-to-r from-amber-500 to-red-500 bg-clip-text text-transparent font-bold">
+              FlameTalk
+            </span>
+          </h1>
+          <p>Your real-time video chat solution</p>
+        </div>
+      </div>
+      <div class="flex justify-center items-center gap-4">
+        <a
+          href={~p"/rooms/new"}
+          class="bg-gradient-to-br from-amber-500 to-red-500 text-white px-4 py-2 rounded-md font-semibold"
+        >
+          Create a Room
+        </a>
+        <a
+          href={~p"/rooms"}
+          class="bg-gradient-to-br from-amber-500 to-red-500 text-white px-4 py-2 rounded-md font-semibold"
+        >
+          Join a Room
+        </a>
+      </div>
+    </section>
+    """
+  end
+end

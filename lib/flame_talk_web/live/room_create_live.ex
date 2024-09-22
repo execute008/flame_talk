@@ -1,5 +1,7 @@
 defmodule FlameTalkWeb.RoomCreateLive do
   use FlameTalkWeb, :live_view
+  use FlameTalkNative, :live_view
+
   alias FlameTalk.Rooms
   alias FlameTalk.Rooms.Room
 

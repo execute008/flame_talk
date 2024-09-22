@@ -16,8 +16,8 @@ defmodule FlameTalkWeb.Endpoint do
   longpoll: false
 
   socket "/live", Phoenix.LiveView.Socket,
-    websocket: [connect_info: [session: @session_options]],
-    longpoll: [connect_info: [session: @session_options]]
+    websocket: [connect_info: [session: @session_options, params: [:platform_id]]],
+    longpoll: [connect_info: [session: @session_options, params: [:platform_id]]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -35,6 +35,7 @@ defmodule FlameTalkWeb.Endpoint do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader
     plug Phoenix.CodeReloader
+    plug LiveViewNative.LiveReloader
     plug Phoenix.Ecto.CheckRepoStatus, otp_app: :flame_talk
   end
 

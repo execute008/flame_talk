@@ -1,5 +1,6 @@
 defmodule FlameTalkWeb.RoomLive do
   use FlameTalkWeb, :live_view
+  use FlameTalkNative, :live_view
   alias FlameTalkWeb.Presence
   alias FlameTalk.Rooms
   alias YourAppWeb.Components.Icons

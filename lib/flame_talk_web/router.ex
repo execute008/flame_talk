@@ -4,10 +4,15 @@ defmodule FlameTalkWeb.Router do
   import FlameTalkWeb.UserAuth
 
   pipeline :browser do
-    plug :accepts, ["html"]
+    plug :accepts, [
+      "html",
+      "swiftui"
+    ]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_root_layout, html: {FlameTalkWeb.Layouts, :root}
+    plug :put_root_layout,
+      html: {FlameTalkWeb.Layouts, :root},
+      swiftui: {FlameTalkWeb.Layouts.SwiftUI, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
@@ -20,7 +25,7 @@ defmodule FlameTalkWeb.Router do
   scope "/", FlameTalkWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", HomeLive
     live "/rooms", RoomListLive, :index
   end
 

@@ -1,0 +1,522 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		138FC274F87BDC8CFC93BD68 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3A99525DEBBD27931F56E7B3 /* Preview Assets.xcassets */; };
+		29B7B74EE367C6A816E5DFB6 /* LiveViewNative in Frameworks */ = {isa = PBXBuildFile; productRef = 7761CD3121A868FEF44BBCEC /* LiveViewNative */; };
+		40D426E463048F6A60C0B14F /* LiveViewNativeLiveForm in Frameworks */ = {isa = PBXBuildFile; productRef = D169A1787F188034A33EDA50 /* LiveViewNativeLiveForm */; };
+		4844D4CAAD1DEE1563ECC1E8 /* ReconnectingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD04E9DB68F9705BBDD87551 /* ReconnectingView.swift */; };
+		58B2FEF96556F589DCCD7FED /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC79F4CCBFC9B2BEB51A010 /* ContentView.swift */; };
+		61AC3452563C9CCA7628E90B /* ConnectingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF8CBFCDD26FD7AA9FF40E5 /* ConnectingView.swift */; };
+		6222F37B4166573E912D8842 /* ConnectingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF8CBFCDD26FD7AA9FF40E5 /* ConnectingView.swift */; };
+		695195948CEC408E29D78128 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3A99525DEBBD27931F56E7B3 /* Preview Assets.xcassets */; };
+		6A32978E3154283EDBA83292 /* FlameTalk.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF1091F228ACA5639B6F492 /* FlameTalk.swift */; };
+		75F37E4FE74554988575E2A3 /* ReconnectingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD04E9DB68F9705BBDD87551 /* ReconnectingView.swift */; };
+		8158AED518188D831C8F6A61 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC79F4CCBFC9B2BEB51A010 /* ContentView.swift */; };
+		8E61E10FF214CFA5CBD8A658 /* DisconnectedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8445391911D74B769103F2B4 /* DisconnectedView.swift */; };
+		92EDC65D739CD1F7165E09E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D767D991896E437E889548DB /* Assets.xcassets */; };
+		96EADC1B2288757515904869 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D767D991896E437E889548DB /* Assets.xcassets */; };
+		9A60EDB2D3FE75848D9E4B21 /* FlameTalk.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF1091F228ACA5639B6F492 /* FlameTalk.swift */; };
+		A1CE70D1534F7F50F5AC931D /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97251A1EAEDC56140D3BE2B /* ErrorView.swift */; };
+		C51F481387CAD34850E25861 /* LiveViewNative in Frameworks */ = {isa = PBXBuildFile; productRef = C81E80D710E22C24A4B67C90 /* LiveViewNative */; };
+		DF1F28D67CE2116D807554A9 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97251A1EAEDC56140D3BE2B /* ErrorView.swift */; };
+		DFE6942049252EF700C8DCCB /* DisconnectedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8445391911D74B769103F2B4 /* DisconnectedView.swift */; };
+		F94C22E6E1FABD9D3956A2D7 /* LiveViewNativeLiveForm in Frameworks */ = {isa = PBXBuildFile; productRef = 36A90C203783558789A2F8AA /* LiveViewNativeLiveForm */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		01C10FB4B262576B45A0B756 /* FlameTalk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlameTalk.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A99525DEBBD27931F56E7B3 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		47F7F46DB292D5A1C95A12E6 /* FlameTalk Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "FlameTalk Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7CF8CBFCDD26FD7AA9FF40E5 /* ConnectingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectingView.swift; sourceTree = "<group>"; };
+		8445391911D74B769103F2B4 /* DisconnectedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisconnectedView.swift; sourceTree = "<group>"; };
+		D767D991896E437E889548DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F97251A1EAEDC56140D3BE2B /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
+		FAC79F4CCBFC9B2BEB51A010 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		FD04E9DB68F9705BBDD87551 /* ReconnectingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconnectingView.swift; sourceTree = "<group>"; };
+		FEF1091F228ACA5639B6F492 /* FlameTalk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlameTalk.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		95A6091941CEB20C6D5DA772 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				29B7B74EE367C6A816E5DFB6 /* LiveViewNative in Frameworks */,
+				F94C22E6E1FABD9D3956A2D7 /* LiveViewNativeLiveForm in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D4BEC79E7CA2E2671FFED3DD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C51F481387CAD34850E25861 /* LiveViewNative in Frameworks */,
+				40D426E463048F6A60C0B14F /* LiveViewNativeLiveForm in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1AD25AB135E390085687D8CA /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				3A99525DEBBD27931F56E7B3 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		B6ABEB004CF6BB2F47417680 /* FlameTalk */ = {
+			isa = PBXGroup;
+			children = (
+				1AD25AB135E390085687D8CA /* Preview Content */,
+				D767D991896E437E889548DB /* Assets.xcassets */,
+				7CF8CBFCDD26FD7AA9FF40E5 /* ConnectingView.swift */,
+				FAC79F4CCBFC9B2BEB51A010 /* ContentView.swift */,
+				8445391911D74B769103F2B4 /* DisconnectedView.swift */,
+				F97251A1EAEDC56140D3BE2B /* ErrorView.swift */,
+				FEF1091F228ACA5639B6F492 /* FlameTalk.swift */,
+				FD04E9DB68F9705BBDD87551 /* ReconnectingView.swift */,
+			);
+			path = FlameTalk;
+			sourceTree = "<group>";
+		};
+		C9226C37541A3821E452883B = {
+			isa = PBXGroup;
+			children = (
+				B6ABEB004CF6BB2F47417680 /* FlameTalk */,
+				DA6E96786950C7A01785490B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DA6E96786950C7A01785490B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				47F7F46DB292D5A1C95A12E6 /* FlameTalk Watch App.app */,
+				01C10FB4B262576B45A0B756 /* FlameTalk.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B57F7BF84C3EE315D2559866 /* FlameTalk Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B8A9FCFE2F19B04789E06A21 /* Build configuration list for PBXNativeTarget "FlameTalk Watch App" */;
+			buildPhases = (
+				E47A15B16A4CBE3C62919EC4 /* Sources */,
+				19A7846D09F597C7E95AA316 /* Resources */,
+				D4BEC79E7CA2E2671FFED3DD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "FlameTalk Watch App";
+			packageProductDependencies = (
+				C81E80D710E22C24A4B67C90 /* LiveViewNative */,
+				D169A1787F188034A33EDA50 /* LiveViewNativeLiveForm */,
+			);
+			productName = "FlameTalk Watch App";
+			productReference = 47F7F46DB292D5A1C95A12E6 /* FlameTalk Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E360A253EC419F2C6F0E1C30 /* FlameTalk */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B1F570E69DF2C89E1E400A34 /* Build configuration list for PBXNativeTarget "FlameTalk" */;
+			buildPhases = (
+				0568927EA09BE0AA788A955D /* Sources */,
+				670859D8CD0B13549E3E378C /* Resources */,
+				95A6091941CEB20C6D5DA772 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FlameTalk;
+			packageProductDependencies = (
+				7761CD3121A868FEF44BBCEC /* LiveViewNative */,
+				36A90C203783558789A2F8AA /* LiveViewNativeLiveForm */,
+			);
+			productName = FlameTalk;
+			productReference = 01C10FB4B262576B45A0B756 /* FlameTalk.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E497346ABAE513B046E182A5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = B3E094DFC4BC883D244F44A3 /* Build configuration list for PBXProject "FlameTalk" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = C9226C37541A3821E452883B;
+			packageReferences = (
+				FE5E2C5B36A8D48B0A3F15FE /* XCRemoteSwiftPackageReference "liveview-client-swiftui" */,
+				2CCAF13AE969D82E2933C6DD /* XCRemoteSwiftPackageReference "liveview-native-live-form" */,
+			);
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E360A253EC419F2C6F0E1C30 /* FlameTalk */,
+				B57F7BF84C3EE315D2559866 /* FlameTalk Watch App */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		19A7846D09F597C7E95AA316 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				92EDC65D739CD1F7165E09E1 /* Assets.xcassets in Resources */,
+				695195948CEC408E29D78128 /* Preview Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		670859D8CD0B13549E3E378C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96EADC1B2288757515904869 /* Assets.xcassets in Resources */,
+				138FC274F87BDC8CFC93BD68 /* Preview Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0568927EA09BE0AA788A955D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				61AC3452563C9CCA7628E90B /* ConnectingView.swift in Sources */,
+				58B2FEF96556F589DCCD7FED /* ContentView.swift in Sources */,
+				DFE6942049252EF700C8DCCB /* DisconnectedView.swift in Sources */,
+				DF1F28D67CE2116D807554A9 /* ErrorView.swift in Sources */,
+				9A60EDB2D3FE75848D9E4B21 /* FlameTalk.swift in Sources */,
+				75F37E4FE74554988575E2A3 /* ReconnectingView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E47A15B16A4CBE3C62919EC4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6222F37B4166573E912D8842 /* ConnectingView.swift in Sources */,
+				8158AED518188D831C8F6A61 /* ContentView.swift in Sources */,
+				8E61E10FF214CFA5CBD8A658 /* DisconnectedView.swift in Sources */,
+				A1CE70D1534F7F50F5AC931D /* ErrorView.swift in Sources */,
+				6A32978E3154283EDBA83292 /* FlameTalk.swift in Sources */,
+				4844D4CAAD1DEE1563ECC1E8 /* ReconnectingView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		24F9E2BE14D7A20B994DA7BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = P967B7929Z;
+				INFOPLIST_KEY_CFBundleDisplayName = FlameTalk;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.example.FlameTalk;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "art.axiis.flame-talk";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator appletvos appletvsimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+			};
+			name = Debug;
+		};
+		267C48A3514D0BE3E916672B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.FlameTalk.watchkit;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		50A44DF091DC19A3DDDB8787 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = P967B7929Z;
+				INFOPLIST_KEY_CFBundleDisplayName = FlameTalk;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.example.FlameTalk;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "art.axiis.flame-talk";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator appletvos appletvsimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+			};
+			name = Release;
+		};
+		51A0993B1C8421BED74D5254 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.FlameTalk.watchkit;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
+		};
+		77FFAD450B290BEAFA6F9B82 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1.0;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = FlameTalk;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.example.FlameTalk;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TVOS_DEPLOYMENT_TARGET = 16.0;
+				WATCHOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Release;
+		};
+		A5BBE64A6822B9510D0AAB26 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1.0;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = FlameTalk;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.example.FlameTalk;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TVOS_DEPLOYMENT_TARGET = 16.0;
+				WATCHOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B1F570E69DF2C89E1E400A34 /* Build configuration list for PBXNativeTarget "FlameTalk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				24F9E2BE14D7A20B994DA7BB /* Debug */,
+				50A44DF091DC19A3DDDB8787 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B3E094DFC4BC883D244F44A3 /* Build configuration list for PBXProject "FlameTalk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A5BBE64A6822B9510D0AAB26 /* Debug */,
+				77FFAD450B290BEAFA6F9B82 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B8A9FCFE2F19B04789E06A21 /* Build configuration list for PBXNativeTarget "FlameTalk Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				267C48A3514D0BE3E916672B /* Debug */,
+				51A0993B1C8421BED74D5254 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2CCAF13AE969D82E2933C6DD /* XCRemoteSwiftPackageReference "liveview-native-live-form" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/liveview-native/liveview-native-live-form";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.0;
+			};
+		};
+		FE5E2C5B36A8D48B0A3F15FE /* XCRemoteSwiftPackageReference "liveview-client-swiftui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/liveview-native/liveview-client-swiftui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		36A90C203783558789A2F8AA /* LiveViewNativeLiveForm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2CCAF13AE969D82E2933C6DD /* XCRemoteSwiftPackageReference "liveview-native-live-form" */;
+			productName = LiveViewNativeLiveForm;
+		};
+		7761CD3121A868FEF44BBCEC /* LiveViewNative */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE5E2C5B36A8D48B0A3F15FE /* XCRemoteSwiftPackageReference "liveview-client-swiftui" */;
+			productName = LiveViewNative;
+		};
+		C81E80D710E22C24A4B67C90 /* LiveViewNative */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE5E2C5B36A8D48B0A3F15FE /* XCRemoteSwiftPackageReference "liveview-client-swiftui" */;
+			productName = LiveViewNative;
+		};
+		D169A1787F188034A33EDA50 /* LiveViewNativeLiveForm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2CCAF13AE969D82E2933C6DD /* XCRemoteSwiftPackageReference "liveview-native-live-form" */;
+			productName = LiveViewNativeLiveForm;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = E497346ABAE513B046E182A5 /* Project object */;
+}
