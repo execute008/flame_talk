@@ -4,7 +4,6 @@ defmodule FlameTalkWeb.RoomLive do
   alias FlameTalk.Rooms
   alias YourAppWeb.Components.Icons
 
-
   @impl true
   def mount(%{"id" => room_id}, session, socket) do
     Process.flag(:trap_exit, true)
@@ -178,12 +177,7 @@ defmodule FlameTalkWeb.RoomLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div
-      class="container mx-auto px-4 py-8"
-      id="room"
-      data-room-id={@room_id}
-      data-user-id={@user_id}
-    >
+    <div class="container mx-auto px-4 py-8" id="room" data-room-id={@room_id} data-user-id={@user_id}>
       <h1 class="text-3xl font-bold mb-4"><%= @room.name %></h1>
       <%= if @joined do %>
         <div id="video-container" phx-hook="WebRTC" class={if @fullscreen, do: "fullscreen", else: ""}>
@@ -221,7 +215,7 @@ defmodule FlameTalkWeb.RoomLive do
             class="absolute top-4 left-4 z-10 bg-red-500 hover:bg-red-700 text-white p-2 rounded-full shadow-lg"
             title="Leave Room"
           >
-          <Icons.exit_room_icon />
+            <Icons.exit_room_icon />
           </button>
           <button
             phx-click="toggle_fullscreen"
