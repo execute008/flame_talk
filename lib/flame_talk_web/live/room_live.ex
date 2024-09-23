@@ -99,22 +99,6 @@ defmodule FlameTalkWeb.RoomLive do
   end
 
   @impl true
-  def handle_event("send_message", %{"message" => message}, socket) do
-    %{user_id: user_id, topic: topic} = socket.assigns
-
-    FlameTalkWeb.Endpoint.broadcast_from(self(), topic, "new_message", %{
-      user_id: user_id,
-      message: message
-    })
-
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_info(%{event: "new_message", payload: payload}, socket) do
-    {:noreply, push_event(socket, "new_message", payload)}
-  end
-
   @impl true
   def handle_info(
         %Phoenix.Socket.Broadcast{event: "ready_to_connect", payload: %{user_id: user_id}},
@@ -190,7 +174,6 @@ defmodule FlameTalkWeb.RoomLive do
     FlameTalkWeb.Endpoint.broadcast(topic, "user_left", %{user_id: user_id})
   end
 
-
   @impl true
   def render(assigns) do
     ~H"""
@@ -245,14 +228,6 @@ defmodule FlameTalkWeb.RoomLive do
               <Icons.fullscreen_icon />
             <% end %>
           </button>
-
-          <div id="chat-container" class="w-1/4 ml-4">
-            <div id="chat-messages" class="h-96 overflow-y-auto border border-gray-300 rounded p-2 mb-2"></div>
-            <form phx-submit="send_message" class="flex">
-              <input type="text" name="message" placeholder="Type a message..." class="flex-grow border border-gray-300 rounded-l p-2" required>
-              <button type="submit" class="bg-blue-500 text-white rounded-r px-4 py-2">Send</button>
-            </form>
-          </div>
         </div>
       <% else %>
         <div class="bg-white shadow-md rounded-lg p-6 mb-6">
