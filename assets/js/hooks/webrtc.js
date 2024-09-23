@@ -45,11 +45,9 @@ const WebRTC = {
 
     this.viewingMode = "remote";
 
-    // Get references to the video containers
     this.localVideoContainer = document.getElementById("local-video-container");
     this.remoteVideosContainer = document.getElementById("remote-videos");
 
-    // Add click listener to local video container
     this.localVideoContainer.addEventListener("click", () =>
       this.toggleViewingMode()
     );
@@ -58,6 +56,44 @@ const WebRTC = {
     this.createSwitchBackButton();
 
     window.addEventListener("resize", () => this.resizeVideos());
+
+    this.handleEvent("new_message", (payload) => {
+      this.addChatMessage(payload.user_id, payload.message);
+    });
+
+    this.el.addEventListener("submit", (e) => {
+      if (e.target.getAttribute("phx-submit") === "send_message") {
+        e.preventDefault();
+        const messageInput = e.target.querySelector('input[name="message"]');
+        const message = messageInput.value.trim();
+        if (message) {
+          this.pushEvent("send_message", { message });
+          this.addChatMessage(this.userId, message);
+          messageInput.value = "";
+        }
+      }
+    });
+  },
+
+  addChatMessage(userId, message) {
+    const chatMessages = document.getElementById("chat-messages");
+    const messageElement = document.createElement("div");
+    messageElement.className = "mb-2";
+    messageElement.innerHTML = `
+      <span class="font-bold">${userId === this.userId ? "You" : userId.slice(0, 5) + "..."}</span>:
+      <span>${this.escapeHtml(message)}</span>
+    `;
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  },
+
+  escapeHtml(unsafe) {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   },
 
   // WebRTC methods
@@ -69,10 +105,9 @@ const WebRTC = {
         console.log("Local stream obtained, connecting to peers");
         users.forEach((user_id) => {
           if (user_id !== this.userId) {
-            this.connectToPeer(user_id, true); // New user creates offers
+            this.connectToPeer(user_id, true);
           }
         });
-        // Removed the 'ready_to_connect' broadcast
       })
       .catch((error) => {
         console.error("Error getting local stream:", error);
