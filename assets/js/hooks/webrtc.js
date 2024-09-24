@@ -57,34 +57,39 @@ const WebRTC = {
 
     window.addEventListener("resize", () => this.resizeVideos());
 
-    this.handleEvent("new_message", (payload) => {
-      this.addChatMessage(payload.user_id, payload.message);
-    });
+    this.chatMessages = this.el.querySelector("#chat-messages");
+    this.messageTextarea = this.el.querySelector('#send_message');
 
-    this.el.addEventListener("submit", (e) => {
-      if (e.target.getAttribute("phx-submit") === "send_message") {
-        e.preventDefault();
-        const messageInput = e.target.querySelector('input[name="message"]');
-        const message = messageInput.value.trim();
-        if (message) {
-          this.pushEvent("send_message", { message });
-          this.addChatMessage(this.userId, message);
-          messageInput.value = "";
-        }
+    this.handleEvent("new_message", () => {
+      if (this.isFullscreen || !this.isChatVisible()) {
+        this.showMessageBanner();
       }
+      this.scrollChatToBottom();
     });
   },
 
   addChatMessage(userId, message) {
     const chatMessages = document.getElementById("chat-messages");
     const messageElement = document.createElement("div");
-    messageElement.className = "mb-2";
+    const isOwnMessage = userId === this.el.dataset.userId;
+    messageElement.className = `p-2 rounded-lg ${isOwnMessage ? 'bg-blue-100 ml-auto' : 'bg-gray-100'} ${isOwnMessage ? 'text-right' : ''}`;
+    messageElement.style.maxWidth = '80%';
     messageElement.innerHTML = `
-      <span class="font-bold">${userId === this.userId ? "You" : userId.slice(0, 5) + "..."}</span>:
+      <span class="font-bold ${isOwnMessage ? 'text-blue-600' : 'text-gray-600'}">${isOwnMessage ? "You" : userId.slice(0, 5) + "..."}</span>:
       <span>${this.escapeHtml(message)}</span>
     `;
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+  },
+
+  scrollChatToBottom() {
+    const chatMessages = document.getElementById("chat-messages");
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  },
+
+  isChatVisible() {
+    const chatToggle = document.getElementById('chat-toggle');
+    return window.innerWidth >= 768 || chatToggle.checked;
   },
 
   escapeHtml(unsafe) {
