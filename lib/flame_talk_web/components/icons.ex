@@ -1,4 +1,4 @@
-defmodule YourAppWeb.Components.Icons do
+defmodule FlameTalkWeb.Components.Icons do
   use Phoenix.Component
 
   @doc "Fullscreen icon"

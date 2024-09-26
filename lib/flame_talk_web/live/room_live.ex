@@ -2,7 +2,8 @@ defmodule FlameTalkWeb.RoomLive do
   use FlameTalkWeb, :live_view
   alias FlameTalkWeb.Presence
   alias FlameTalk.Rooms
-  alias YourAppWeb.Components.Icons
+  alias FlameTalkWeb.Components.Icons
+  alias FlameTalkWeb.VideoContainerComponent
 
   @impl true
   def mount(%{"id" => room_id}, session, socket) do
@@ -215,59 +216,13 @@ defmodule FlameTalkWeb.RoomLive do
       <h1 class="text-3xl font-bold mb-4"><%= @room.name %></h1>
       <%= if @joined do %>
         <div class="flex relative flex-col sm:flex-row">
-          <div
+          <.live_component
+            module={VideoContainerComponent}
             id="video-container"
-            phx-hook="WebRTC"
-            class={if @fullscreen, do: "fullscreen", else: ""}
-          >
-            <div id="remote-videos" class={"grid gap-4 #{grid_class(length(@users) - 1)}"}>
-              <%= for user_id <- @users do %>
-                <%= if user_id != @user_id do %>
-                  <div class="relative video-aspect-ratio">
-                    <video
-                      id={"remote-video-#{user_id}"}
-                      data-user-id={user_id}
-                      autoplay
-                      playsinline
-                      class="object-cover rounded-lg"
-                    >
-                    </video>
-                    <div class="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
-                      <%= String.slice(user_id, 0..5) %>...
-                    </div>
-                  </div>
-                <% end %>
-              <% end %>
-            </div>
-            <div id="local-video-container" class="absolute bottom-4 right-4 w-1/4 max-w-xs">
-              <video
-                id="local-video"
-                autoplay
-                muted
-                playsinline
-                class="w-full h-full object-cover rounded-lg shadow-lg"
-              >
-              </video>
-            </div>
-            <button
-              phx-click="leave"
-              class="absolute top-4 left-4 z-10 bg-red-500 hover:bg-red-700 text-white p-2 rounded-full shadow-lg"
-              title="Leave Room"
-            >
-              <Icons.exit_room_icon />
-            </button>
-            <button
-              phx-click="toggle_fullscreen"
-              class="absolute top-4 right-4 z-10 bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg"
-              title="Toggle Fullscreen"
-            >
-              <%= if @fullscreen do %>
-                <Icons.exit_fullscreen_icon />
-              <% else %>
-                <Icons.fullscreen_icon />
-              <% end %>
-            </button>
-          </div>
+            fullscreen={@fullscreen}
+            users={@users}
+            user_id={@user_id}
+          />
           <div class="fixed bottom-4 right-4 md:relative md:top-auto md:right-auto md:w-1/4 md:ml-4 z-[9999]">
             <input type="checkbox" id="chat-toggle" class="hidden peer" />
             <label
