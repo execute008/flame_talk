@@ -2,8 +2,8 @@ defmodule FlameTalkWeb.RoomLive do
   use FlameTalkWeb, :live_view
   alias FlameTalkWeb.Presence
   alias FlameTalk.Rooms
-  alias FlameTalkWeb.Components.Icons
   alias FlameTalkWeb.VideoContainerComponent
+  alias FlameTalkWeb.ChatboxComponent
 
   @impl true
   def mount(%{"id" => room_id}, session, socket) do
@@ -212,8 +212,8 @@ defmodule FlameTalkWeb.RoomLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="container mx-auto px-4 py-8" id="room" data-room-id={@room_id} data-user-id={@user_id}>
-      <h1 class="text-3xl font-bold mb-4"><%= @room.name %></h1>
+    <div class="container mx-auto px-4 py-2" id="room" data-room-id={@room_id} data-user-id={@user_id}>
+      <h1 class="text-3xl font-bold mb-1"><%= @room.name %></h1>
       <%= if @joined do %>
         <div class="flex relative flex-col sm:flex-row">
           <.live_component
@@ -223,68 +223,15 @@ defmodule FlameTalkWeb.RoomLive do
             users={@users}
             user_id={@user_id}
           />
-          <div class="fixed bottom-4 right-4 md:relative md:top-auto md:right-auto md:w-1/4 md:ml-4 z-[9999]">
-            <input type="checkbox" id="chat-toggle" class="hidden peer" />
-            <label
-              for="chat-toggle"
-              class={"#{if @fullscreen do "" else "md:hidden" end} fixed bottom-4 left-4 z-20 bg-blue-500 text-white p-2 rounded-full shadow-lg cursor-pointer"}
-            >
-              <Icons.chat_icon />
-            </label>
+          <.live_component
+            module={ChatboxComponent}
+            id="chat-container"
+            streams={@streams}
+            user_id={@user_id}
+            fullscreen={@fullscreen}
+            message={@message}
 
-            <div
-              id="chat-container"
-              class={"fixed bottom-0 right-0 w-full h-2/3 md:h-auto md:w-full bg-white shadow-lg rounded-t-lg md:rounded-lg transform translate-y-full transition-transform duration-300 ease-in-out peer-checked:translate-y-0 #{if @fullscreen do "" else "md:translate-y-0 md:static md:shadow-none" end}"}
-            >
-              <div class="p-4">
-                <h2 class="text-xl font-bold mb-4">Chat</h2>
-                <div
-                  id="chat-messages"
-                  class="h-[calc(100%-6rem)] md:h-56 w-full overflow-y-auto border border-gray-300 rounded p-2 mb-2 space-y-2"
-                  phx-update="stream"
-                >
-                  <div :for={{dom_id, message} <- @streams.messages} id={dom_id}>
-                    <div
-                      class={"p-2 rounded-lg #{if message.user_id == @user_id, do: "bg-blue-100 ml-auto text-right", else: "bg-gray-100"}"}
-                      style="max-width: 80%;"
-                    >
-                      <span class={"font-bold #{if message.user_id == @user_id, do: "text-blue-600", else: "text-gray-600"}"}>
-                      <%= if message.user_id == @user_id, do: "You", else: String.slice(message.user_id, 0..5) <> "..." %>
-                    </span>:
-                      <span><%= message.message %></span>
-                    </div>
-                  </div>
-                </div>
-                <form phx-submit="send_message" phx-change="form_updated">
-                  <div class="flex-grow relative">
-                    <textarea
-                      id="send_message"
-                      name="message"
-                      placeholder="Type a message..."
-                      class="w-full border border-gray-300 rounded-l p-2 pr-10 resize-none overflow-hidden"
-                      rows="1"
-                      required
-                      phx-hook="AutoResizeTextarea"
-                      value={@message}
-                    ></textarea>
-                    <button
-                      type="submit"
-                      class="absolute right-2 bottom-2 text-blue-500 hover:text-blue-700"
-                    >
-                      <Icons.send_icon />
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-
-          <div
-            id="message-banner"
-            class="hidden fixed top-4 right-4 bg-blue-500 text-white p-2 rounded shadow-lg z-30"
-          >
-            New message received
-          </div>
+          />
         </div>
       <% else %>
         <div class="bg-white shadow-md rounded-lg p-6 mb-6">
