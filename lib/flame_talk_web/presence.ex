@@ -7,7 +7,7 @@ defmodule FlameTalkWeb.Presence do
     {:ok, %{}}
   end
 
-  def handle_metas(topic, %{joins: joins, leaves: leaves}, _presences, state) do
+  def handle_metas(_topic, %{joins: joins, leaves: leaves}, _presences, state) do
     for {user_id, _} <- joins do
       Phoenix.PubSub.subscribe(FlameTalk.PubSub, "user_presence:#{user_id}")
     end
