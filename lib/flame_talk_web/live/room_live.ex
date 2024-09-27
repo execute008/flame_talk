@@ -197,7 +197,7 @@ defmodule FlameTalkWeb.RoomLive do
   end
 
   @impl true
-  def terminate(reason, socket) do
+  def terminate(_reason, socket) do
     leave_room(socket)
     {:noreply, socket}
   end
@@ -245,10 +245,10 @@ defmodule FlameTalkWeb.RoomLive do
                 >
                   <div :for={{dom_id, message} <- @streams.messages} id={dom_id}>
                     <div
-                      class={"p-2 rounded-lg #{if message.user_id == @user_id, do: 'bg-blue-100 ml-auto text-right', else: 'bg-gray-100'}"}
+                      class={"p-2 rounded-lg #{if message.user_id == @user_id, do: "bg-blue-100 ml-auto text-right", else: "bg-gray-100"}"}
                       style="max-width: 80%;"
                     >
-                      <span class={"font-bold #{if message.user_id == @user_id, do: 'text-blue-600', else: 'text-gray-600'}"}>
+                      <span class={"font-bold #{if message.user_id == @user_id, do: "text-blue-600", else: "text-gray-600"}"}>
                       <%= if message.user_id == @user_id, do: "You", else: String.slice(message.user_id, 0..5) <> "..." %>
                     </span>:
                       <span><%= message.message %></span>
@@ -306,17 +306,6 @@ defmodule FlameTalkWeb.RoomLive do
       <% end %>
     </div>
     """
-  end
-
-  defp grid_class(users_count) do
-    case users_count do
-      1 -> "grid-cols-1"
-      2 -> "grid-cols-1 sm:grid-cols-2"
-      3 -> "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
-      4 -> "grid-cols-2 sm:grid-cols-2"
-      n when n in 5..6 -> "grid-cols-2 sm:grid-cols-3"
-      _ -> "grid-cols-2 sm:grid-cols-3 md:grid-cols-4"
-    end
   end
 
   defp list_present_users(topic) do
