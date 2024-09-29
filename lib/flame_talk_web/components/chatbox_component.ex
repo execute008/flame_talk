@@ -4,7 +4,7 @@ defmodule FlameTalkWeb.ChatboxComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="fixed bottom-4 right-4 md:relative md:top-auto md:right-auto md:w-1/4 md:ml-4 z-[9999]">
+      <div class="fixed bottom-4 right-4 md:relative md:top-auto md:right-auto md:w-1/4 md:ml-4 z-[9999]">
             <input type="checkbox" id="chat-toggle" class="hidden peer" />
             <label
               for="chat-toggle"
