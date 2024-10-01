@@ -100,7 +100,6 @@ defmodule FlameTalkWeb.RoomLive do
 
   @impl true
   def handle_event("toggle_fullscreen", _, socket) do
-    chat_visible = socket.assigns.chat_visible || socket.assigns.fullscreen
     {:noreply, assign(socket, fullscreen: !socket.assigns.fullscreen, chat_visible: false)}
   end
 
