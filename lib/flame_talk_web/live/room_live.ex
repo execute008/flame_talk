@@ -32,7 +32,8 @@ defmodule FlameTalkWeb.RoomLive do
        joined: false,
        users: [],
        fullscreen: false,
-       message: ""
+       message: "",
+       chat_visible: false
      )
      |> stream_configure(:messages, dom_id: &"message-#{&1.id}")
      |> stream(:messages, [])}
@@ -99,12 +100,14 @@ defmodule FlameTalkWeb.RoomLive do
 
   @impl true
   def handle_event("toggle_fullscreen", _, socket) do
-    {:noreply, assign(socket, fullscreen: !socket.assigns.fullscreen)}
+    chat_visible = socket.assigns.chat_visible || socket.assigns.fullscreen
+    {:noreply, assign(socket, fullscreen: !socket.assigns.fullscreen, chat_visible: false)}
   end
 
   @impl true
   def handle_event("form_updated", %{"message" => message}, socket) do
-    {:noreply, assign(socket, message: message)}
+    chat_visible = socket.assigns.chat_visible || socket.assigns.fullscreen
+    {:noreply, assign(socket, message: message, chat_visible: chat_visible)}
   end
 
   @impl true
@@ -229,6 +232,7 @@ defmodule FlameTalkWeb.RoomLive do
             streams={@streams}
             user_id={@user_id}
             fullscreen={@fullscreen}
+            chat_visible={@chat_visible}
             message={@message}
 
           />
