@@ -5,7 +5,7 @@ defmodule FlameTalkWeb.ChatboxComponent do
   def render(assigns) do
     ~H"""
     <div class="fixed bottom-4 right-4 md:relative md:top-auto md:right-auto md:w-1/4 md:ml-4 z-[9999]">
-      <input type="checkbox" id="chat-toggle" class="hidden peer" />
+      <input type="checkbox" id="chat-toggle" class="hidden peer" checked={@chat_visible} />
       <label
         for="chat-toggle"
         class={"#{if @fullscreen do "" else "md:hidden" end} fixed bottom-4 left-4 z-20 bg-blue-500 text-white p-2 rounded-full shadow-lg cursor-pointer"}
@@ -15,13 +15,13 @@ defmodule FlameTalkWeb.ChatboxComponent do
 
       <div
         id="chat-container"
-        class={"fixed bottom-0 right-0 w-full h-2/3 md:h-auto md:w-full bg-white shadow-lg rounded-t-lg md:rounded-lg transform translate-y-full transition-transform duration-300 ease-in-out peer-checked:translate-y-0 #{if @fullscreen do "" else "md:translate-y-0 md:static md:shadow-none" end}"}
+        class={"fixed bottom-0 right-0 w-full h-2/3 md:h-auto md:w-full bg-white shadow-lg rounded-t-lg md:rounded-lg transform translate-y-full transition-transform duration-300 ease-in-out peer-checked:translate-y-0 #{if @fullscreen do "translate-y-0" else "md:translate-y-0 md:static md:shadow-none" end}"}
       >
         <div class="p-4">
           <h2 class="text-xl font-bold mb-4">Chat</h2>
           <div
             id="chat-messages"
-            class="h-[calc(100%-6rem)] md:h-56 w-full overflow-y-auto border border-gray-300 rounded p-2 mb-2 space-y-2"
+            class="h-56 w-full overflow-y-auto border border-gray-300 rounded p-2 mb-2 space-y-2"
             phx-update="stream"
           >
             <div :for={{dom_id, message} <- @streams.messages} id={dom_id}>
@@ -30,8 +30,8 @@ defmodule FlameTalkWeb.ChatboxComponent do
                 style="max-width: 80%;"
               >
                 <span class={"font-bold #{if message.user_id == @user_id, do: "text-blue-600", else: "text-gray-600"}"}>
-                <%= if message.user_id == @user_id, do: "You", else: String.slice(message.user_id, 0..5) <> "..." %>
-              </span>:
+                  <%= if message.user_id == @user_id, do: "You", else: String.slice(message.user_id, 0..5) <> "..." %>
+                </span>:
                 <span><%= message.message %></span>
               </div>
             </div>
