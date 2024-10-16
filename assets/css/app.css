@@ -178,3 +178,21 @@ html, body {
   text-align: center;
  
 }
+
+.video-container {
+  transition: all 0.3s ease;
+}
+
+#game-container {
+  transition: all 0.3s ease;
+}
+
+.game-mode .video-container {
+  position: absolute;
+  z-index: 20;
+}
+
+.game-mode .video-aspect-ratio {
+  width: 150px;
+  height: 100px;
+}
