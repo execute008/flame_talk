@@ -1,9 +1,12 @@
 defmodule FlameTalkWeb.RoomLive do
+  alias FlameTalkWeb.GameComponent
   use FlameTalkWeb, :live_view
   alias FlameTalkWeb.Presence
   alias FlameTalk.Rooms
   alias FlameTalkWeb.VideoContainerComponent
   alias FlameTalkWeb.ChatboxComponent
+
+  alias FlameTalkWeb.Components.Icons
 
   @impl true
   def mount(%{"id" => room_id}, session, socket) do
@@ -33,7 +36,10 @@ defmodule FlameTalkWeb.RoomLive do
        users: [],
        fullscreen: false,
        message: "",
-       chat_visible: false
+       chat_visible: false,
+       x: 0,
+       z: 0,
+       game_visible: false
      )
      |> stream_configure(:messages, dom_id: &"message-#{&1.id}")
      |> stream(:messages, [])}
@@ -126,6 +132,29 @@ defmodule FlameTalkWeb.RoomLive do
      socket
      |> stream_insert(:messages, new_message)
      |> assign(message: "")}
+  end
+
+  @impl true
+  def handle_event("toggle_game", _, socket) do
+    {:noreply, assign(socket, game_visible: !socket.assigns.game_visible)}
+  end
+
+  @impl true
+  def handle_event("player_move", %{"x" => x, "z" => z}, socket) do
+    new_x = socket.assigns.x + x
+    new_z = socket.assigns.z + z
+
+    FlameTalkWeb.Endpoint.broadcast(socket.assigns.topic, "game_update", %{
+      playerId: socket.assigns.user_id,
+      x: new_x,
+      z: new_z
+    })
+    {:noreply, assign(socket, x: new_x, z: new_z)}
+  end
+
+  @impl true
+  def handle_info(%Phoenix.Socket.Broadcast{event: "game_update", payload: payload}, socket) do
+    {:noreply, push_event(socket, "game_update", payload)}
   end
 
   @impl true
@@ -224,6 +253,7 @@ defmodule FlameTalkWeb.RoomLive do
             fullscreen={@fullscreen}
             users={@users}
             user_id={@user_id}
+            game_visible={@game_visible}
           />
           <.live_component
             module={ChatboxComponent}
@@ -233,8 +263,25 @@ defmodule FlameTalkWeb.RoomLive do
             fullscreen={@fullscreen}
             chat_visible={@chat_visible}
             message={@message}
-
           />
+          <.live_component
+            module={GameComponent}
+            id="game-component"
+            room_id={@room_id}
+            user_id={@user_id}
+            game_visible={@game_visible}
+          />
+          <button
+          phx-click="toggle_game"
+          class="absolute bottom-4 left-4 z-10 bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg"
+          title="Toggle Game"
+          >
+            <%= if @game_visible do %>
+            <Icons.exit_game_icon />
+            <% else %>
+            <Icons.game_icon />
+            <% end %>
+          </button>
         </div>
       <% else %>
         <div class="bg-white shadow-md rounded-lg p-6 mb-6">
