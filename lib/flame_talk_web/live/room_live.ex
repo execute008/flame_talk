@@ -280,6 +280,12 @@ defmodule FlameTalkWeb.RoomLive do
   end
 
   @impl true
+  def handle_info(msg, socket) do
+    IO.puts("Unexpected message received: #{inspect(msg)}")
+    {:noreply, socket}
+  end
+
+  @impl true
   def terminate(_reason, socket) do
     leave_room(socket)
     {:noreply, socket}
