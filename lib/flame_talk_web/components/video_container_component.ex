@@ -74,12 +74,26 @@ defmodule FlameTalkWeb.VideoContainerComponent do
   end
 
   defp video_position(user_id, users) do
-    index = Enum.find_index(users, &(&1 == user_id))
-    total = length(users) - 1  # Subtract 1 to exclude the current user
-    angle = 2 * :math.pi() * index / total
-    radius = 45  # Adjust this value to change how far the videos are from the center
-    x = 50 + radius * :math.cos(angle)
-    y = 50 + radius * :math.sin(angle)
-    "left: #{x}%; top: #{y}%; transform: translate(-50%, -50%);"
+    case {Enum.find_index(users, &(&1 == user_id)), length(users)} do
+      {nil, _} ->
+        # User not found in the list, default to center
+        "left: 50%; top: 50%; transform: translate(-50%, -50%);"
+
+      {_, 1} ->
+        # Only one user, place in center
+        "left: 50%; top: 50%; transform: translate(-50%, -50%);"
+
+      {index, total} when is_integer(index) and total > 1 ->
+        total = total - 1  # Subtract 1 to exclude the current user
+        angle = 2 * :math.pi() * index / total
+        radius = 45  # Adjust this value to change how far the videos are from the center
+        x = 50 + radius * :math.cos(angle)
+        y = 50 + radius * :math.sin(angle)
+        "left: #{x}%; top: #{y}%; transform: translate(-50%, -50%);"
+
+      _ ->
+        # Fallback for any other unexpected case
+        "left: 50%; top: 50%; transform: translate(-50%, -50%);"
+    end
   end
 end

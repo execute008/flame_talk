@@ -8,6 +8,10 @@ defmodule FlameTalkWeb.RoomLive do
 
   alias FlameTalkWeb.Components.Icons
 
+  @tick_rate 30
+  @interpolation_delay 100
+  @max_extrapolation_time 200
+
   @impl true
   def mount(%{"id" => room_id}, session, socket) do
     Process.flag(:trap_exit, true)
@@ -17,6 +21,10 @@ defmodule FlameTalkWeb.RoomLive do
     if connected?(socket) do
       FlameTalkWeb.Endpoint.subscribe(topic)
       Phoenix.PubSub.subscribe(FlameTalk.PubSub, "user_presence:#{room_id}")
+    end
+
+    if connected?(socket) do
+      :timer.send_interval(trunc(1000 / @tick_rate), :tick)
     end
 
     user_id =
@@ -36,10 +44,13 @@ defmodule FlameTalkWeb.RoomLive do
        users: [],
        fullscreen: false,
        message: "",
-       chat_visible: false,
+       chat_visible: true,
        x: 0,
        z: 0,
-       game_visible: false
+       game_visible: false,
+       players: %{},
+       last_processed_input: %{},
+       last_interpolated_players: %{}
      )
      |> stream_configure(:messages, dom_id: &"message-#{&1.id}")
      |> stream(:messages, [])}
@@ -140,21 +151,24 @@ defmodule FlameTalkWeb.RoomLive do
   end
 
   @impl true
-  def handle_event("player_move", %{"x" => x, "z" => z}, socket) do
-    new_x = socket.assigns.x + x
-    new_z = socket.assigns.z + z
+  def handle_event("player_input", %{"input" => input}, socket) do
+    %{user_id: user_id, players: players} = socket.assigns
+    current_time = System.system_time(:millisecond)
 
-    FlameTalkWeb.Endpoint.broadcast(socket.assigns.topic, "game_update", %{
-      playerId: socket.assigns.user_id,
-      x: new_x,
-      z: new_z
+    updated_player = Map.get(players, user_id, %{x: 0, z: 0, dx: 0, dz: 0, last_update: current_time})
+    |> apply_input(input)
+    |> Map.put(:last_update, current_time)
+
+    updated_players = Map.put(players, user_id, updated_player)
+
+    FlameTalkWeb.Endpoint.broadcast(socket.assigns.topic, "player_state", %{
+      user_id: user_id,
+      x: updated_player.x,
+      z: updated_player.z,
+      timestamp: current_time
     })
-    {:noreply, assign(socket, x: new_x, z: new_z)}
-  end
 
-  @impl true
-  def handle_info(%Phoenix.Socket.Broadcast{event: "game_update", payload: payload}, socket) do
-    {:noreply, push_event(socket, "game_update", payload)}
+    {:noreply, assign(socket, players: updated_players)}
   end
 
   @impl true
@@ -163,6 +177,44 @@ defmodule FlameTalkWeb.RoomLive do
      socket
      |> stream_insert(:messages, new_message)
      |> push_event("new_message", %{})}
+  end
+
+  @impl true
+  def handle_info(:tick, socket) do
+    if socket.assigns.game_visible do
+      current_time = System.system_time(:millisecond)
+      interpolation_point = current_time - @interpolation_delay
+
+      interpolated_players = Enum.map(socket.assigns.players, fn {user_id, player} ->
+        {user_id, interpolate_player(player, interpolation_point)}
+      end)
+      |> Map.new()
+
+      last_interpolated = Map.get(socket.assigns, :last_interpolated_players, %{})
+
+      if players_changed?(last_interpolated, interpolated_players) do
+        {:noreply, socket
+                   |> assign(:last_interpolated_players, interpolated_players)
+                   |> push_event("update_players", %{players: interpolated_players})}
+      else
+        {:noreply, socket}
+      end
+    else
+      {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_info(%Phoenix.Socket.Broadcast{event: "player_state", payload: payload}, socket) do
+    %{user_id: user_id, x: x, z: z, timestamp: timestamp} = payload
+    current_players = socket.assigns.players
+
+    updated_player = Map.get(current_players, user_id, %{})
+    |> Map.merge(%{x: x, z: z, last_update: timestamp})
+
+    updated_players = Map.put(current_players, user_id, updated_player)
+
+    {:noreply, assign(socket, players: updated_players)}
   end
 
   @impl true
@@ -238,6 +290,61 @@ defmodule FlameTalkWeb.RoomLive do
     Rooms.remove_participant(room, user_id)
     Presence.untrack(self(), topic, user_id)
     FlameTalkWeb.Endpoint.broadcast(topic, "user_left", %{user_id: user_id})
+  end
+
+
+  defp apply_input(player, input) do
+    speed = 0.1
+    dx = (input["right"] - input["left"]) * speed
+    dz = (input["down"] - input["up"]) * speed
+
+    %{player |
+      x: player.x + dx,
+      z: player.z + dz,
+      dx: dx,
+      dz: dz
+    }
+  end
+
+  defp players_changed?(last_players, current_players) do
+    last_players != current_players
+  end
+
+  defp interpolate_player(player, interpolation_point) do
+    time_difference = interpolation_point - player.last_update
+
+    cond do
+      time_difference <= 0 ->
+        # If the interpolation point is in the past, just use the player's current position
+        player
+
+      time_difference > @max_extrapolation_time ->
+        # If we're extrapolating too far into the future, cap it
+        t = @max_extrapolation_time / 1000
+        %{player |
+          x: player.x + (Map.get(player, :dx, 0) * t),
+          z: player.z + (Map.get(player, :dz, 0) * t)
+        }
+
+      true ->
+        # Hermite interpolation
+        t = time_difference / 1000
+        t2 = t * t
+        t3 = t2 * t
+
+        h1 = 2 * t3 - 3 * t2 + 1
+        h2 = -2 * t3 + 3 * t2
+        h3 = t3 - 2 * t2 + t
+        h4 = t3 - t2
+
+        dx = Map.get(player, :dx, 0)
+        dz = Map.get(player, :dz, 0)
+
+        %{player |
+          x: h1 * player.x + h2 * (player.x + dx) + h3 * dx + h4 * dx,
+          z: h1 * player.z + h2 * (player.z + dz) + h3 * dz + h4 * dz
+        }
+    end
   end
 
   @impl true
