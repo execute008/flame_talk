@@ -33,7 +33,7 @@ export default {
     fire.rotation.x = -Math.PI / 2;
     scene.add(fire);
 
-    const fireLight = new THREE.PointLight(0xff6600, 1000, 50);
+    const fireLight = new THREE.PointLight(0xff6600, 1000000, 1000);
     fireLight.position.set(0, 1.5, 0);
     fireLight.castShadow = true;
     scene.add(fireLight);
