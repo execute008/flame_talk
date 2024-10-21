@@ -1,4 +1,7 @@
 import * as THREE from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { fireFragmentShader, fireVertexShader } from "../data/shaders";
 
 export default {
@@ -6,6 +9,14 @@ export default {
     const canvas = this.el.querySelector("#game-canvas");
     const roomId = this.el.dataset.roomId;
     const userId = this.el.dataset.userId;
+
+    let composer;
+    const bloomParams = {
+      exposure: 1,
+      bloomStrength: 1.5,
+      bloomThreshold: 0,
+      bloomRadius: 0,
+    };
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
@@ -18,6 +29,20 @@ export default {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const renderScene = new RenderPass(scene, camera);
+
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      bloomParams.bloomStrength,
+      bloomParams.bloomRadius,
+      bloomParams.bloomThreshold
+    );
+
+    composer = new EffectComposer(renderer);
+    composer.addPass(renderScene);
+    composer.addPass(bloomPass);
+    composer.renderToScreen = true
 
     const fireGeometry = new THREE.ConeGeometry(0.5, 1, 8);
     const fireMaterial = new THREE.ShaderMaterial({
@@ -33,7 +58,7 @@ export default {
     fire.rotation.x = -Math.PI / 2;
     scene.add(fire);
 
-    const fireLight = new THREE.PointLight(0xff6600, 1000000, 1000);
+    const fireLight = new THREE.PointLight(0xff2200, 1, 100, 2);
     fireLight.position.set(0, 1.5, 0);
     fireLight.castShadow = true;
     scene.add(fireLight);
@@ -72,6 +97,7 @@ export default {
         this.mesh.position.set(x, 0.25, z); // Set initial position
         this.positionBuffer = [{ x, z, timestamp: Date.now() }];
         this.lastUpdateTime = Date.now();
+        this.velocity = new THREE.Vector3();
       }
 
       addPosition(x, z, timestamp) {
@@ -85,6 +111,11 @@ export default {
         if (this.id === userId) {
           this.mesh.position.set(x, 0.25, z);
         }
+      }
+
+      updatePosition(deltaTime) {
+        this.mesh.position.x += this.velocity.x * deltaTime;
+        this.mesh.position.z += this.velocity.z * deltaTime;
       }
 
       interpolate(renderTime) {
@@ -106,7 +137,7 @@ export default {
           // If we don't have two points to interpolate between, use the latest known position
           const latestPosition =
             this.positionBuffer[this.positionBuffer.length - 1];
-          this.mesh.position.set(latestPosition.x, 0, latestPosition.z);
+          this.mesh.position.set(latestPosition.x, 0.25, latestPosition.z);
           return;
         }
 
@@ -162,18 +193,25 @@ export default {
           players.set(playerId, player);
           scene.add(player.mesh);
         }
-        player.addPosition(playerData.x, playerData.z, currentTime);
 
-        // Update local player's stored position
         if (playerId === userId) {
-          this.x = playerData.x;
-          this.z = playerData.z;
+          // For local player, lerp towards the server position
+          const lerpFactor = 0.3;
+          player.mesh.position.x +=
+            (playerData.x - player.mesh.position.x) * lerpFactor;
+          player.mesh.position.z +=
+            (playerData.z - player.mesh.position.z) * lerpFactor;
+        } else {
+          player.addPosition(playerData.x, playerData.z, currentTime);
         }
       });
     });
 
-    let lastInputTime = 0;
     const inputDelay = 50;
+    const jumpPower = 10;
+
+    let lastInputTime = 0;
+    let lastShift = 0;
     let keys = {};
     window.addEventListener("keydown", (e) => (keys[e.key] = true));
     window.addEventListener("keyup", (e) => (keys[e.key] = false));
@@ -188,58 +226,77 @@ export default {
           right: keys["ArrowRight"] ? 1 : 0,
         };
 
+        const speed =
+          keys["Shift"] && lastShift < currentTime - 1000 ? 0.2 : 0.1;
+        lastShift = keys["Shift"] ? currentTime : lastShift;
+
+        const localPlayer = players.get(userId);
+        if (localPlayer) {
+          localPlayer.velocity.set(
+            (input.right - input.left) * speed,
+            0,
+            (input.down - input.up) * speed
+          );
+        }
+
         this.pushEvent("player_input", { input: input });
         lastInputTime = currentTime;
       }
     };
 
+    let lastTime = 0;
     const animate = (time) => {
       requestAnimationFrame(animate);
 
+      const deltaTime = (time - lastTime) / 1000;
+      lastTime = time;
+
       const renderTime = Date.now();
 
-      // Interpolate all players
-      players.forEach((player) => {
-        // if (player.id !== userId) {
-          // Don't interpolate the local player
-          player.interpolate(renderTime);
-        // }
-      });
-
       // Update local player position immediately
-    //   const localPlayer = players.get(userId);
-    //   if (localPlayer) {
-    //     // Use localPlayer.mesh.position instead of this.x and this.z
-    //     localPlayer.mesh.position.y = 0.25; // Set y to 0.5 to raise player above ground
+      const localPlayer = players.get(userId);
+      if (localPlayer) {
+        localPlayer.updatePosition(deltaTime);
 
-    //     Update camera position to follow player
-    //     camera.position.set(
-    //       localPlayer.mesh.position.x,
-    //       5,
-    //       localPlayer.mesh.position.z + 5
-    //     );
-    //     camera.lookAt(
-    //       localPlayer.mesh.position.x,
-    //       0,
-    //       localPlayer.mesh.position.z
-    //     );
-    //   }
+        // Update camera position to follow player
+        // camera.position.set(
+        //   localPlayer.mesh.position.x,
+        //   5,
+        //   localPlayer.mesh.position.z + 5
+        // );
+        // camera.lookAt(
+        //   localPlayer.mesh.position.x,
+        //   0,
+        //   localPlayer.mesh.position.z
+        // );
+      }
+
+      // Interpolate other players
+      players.forEach((player) => {
+        if (player.id !== userId) {
+          player.interpolate(renderTime);
+        }
+      });
 
       updatePlayerInput();
 
       fireMaterial.uniforms.time.value = time * 0.001;
 
-      const intensity = 1 + 0.2 * Math.sin(time * 0.01);
+      const intensity = 20 + 0.5 * Math.sin(time * 0.01);
       fireLight.intensity = intensity;
 
-      renderer.render(scene, camera);
+      composer.render();
     };
     animate();
 
     window.addEventListener("resize", () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(width, height);
+      composer.setSize(width, height);
     });
   },
 };
