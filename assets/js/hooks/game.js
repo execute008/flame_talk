@@ -45,7 +45,7 @@ export default {
     composer = new EffectComposer(renderer);
     composer.addPass(renderScene);
     composer.addPass(bloomPass);
-    composer.renderToScreen = true
+    composer.renderToScreen = true;
 
     const fireGeometry = new THREE.ConeGeometry(0.5, 1, 8);
     const fireMaterial = new THREE.ShaderMaterial({
@@ -127,6 +127,7 @@ export default {
     let keys = {};
     window.addEventListener("keydown", (e) => (keys[e.key] = true));
     window.addEventListener("keyup", (e) => (keys[e.key] = false));
+    let lastInput = {};
 
     const updatePlayerInput = () => {
       const currentTime = Date.now();
@@ -150,8 +151,16 @@ export default {
             (input.down - input.up) * speed
           );
         }
-
-        this.pushEvent("player_input", { input: input });
+    
+        // Only send updates when there's actual input
+        const hasInput = Object.values(input).some(value => value !== 0);
+        const inputChanged = JSON.stringify(input) !== JSON.stringify(lastInput);
+        
+        if (hasInput || inputChanged) {
+          this.pushEvent("player_input", { input: input });
+          lastInput = input;
+        }
+    
         lastInputTime = currentTime;
       }
     };
