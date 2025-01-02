@@ -90,14 +90,9 @@ export default {
     camera.position.set(0, 5, 5);
     camera.lookAt(0, 0, 0);
 
-    const INTERPOLATION_DELAY = 100; // ms
-    const MAX_EXTRAPOLATION_TIME = 200; // ms
-
-    
-
     const players = new Map();
 
-    const localPlayer = new Player(userId, 0, 0);
+    const localPlayer = new Player(userId, 0, 0, true);
     players.set(userId, localPlayer);
     scene.add(localPlayer.mesh);
 
