@@ -138,14 +138,16 @@ export default {
           left: keys["ArrowLeft"] ? 1 : 0,
           right: keys["ArrowRight"] ? 1 : 0,
         };
-
-        const speed =
-          keys["Shift"] && lastShift < currentTime - 1000 ? 0.2 : 0.1;
-        lastShift = keys["Shift"] ? currentTime : lastShift;
-
+    
+        let speed = 0.1;
+        if (keys["Shift"]) {
+          speed = lastShift < currentTime - 1000 ? 0.2 : 0.1;
+          lastShift = currentTime;
+        }
+    
         const localPlayer = players.get(userId);
         if (localPlayer) {
-          localPlayer.velocity.set(
+          localPlayer.setVelocity(
             (input.right - input.left) * speed,
             0,
             (input.down - input.up) * speed
