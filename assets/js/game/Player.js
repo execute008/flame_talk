@@ -1,13 +1,30 @@
 import * as THREE from "three";
 
+const INTERPOLATION_DELAY = 100; // ms
+const MAX_EXTRAPOLATION_TIME = 200; // ms
+
 export default class Player {
-  constructor(id, x, z) {
+  constructor(id, x, z, isLocalPlayer = false) {
+    console.log("Creating player", id);
     this.id = id;
+
+    this.initialX = Number.isFinite(x) ? x : 0;
+    this.initialZ = Number.isFinite(z) ? z : 0;
+
     this.mesh = this.createPlayerMesh();
-    this.mesh.position.set(x, 0.25, z); // Set initial position
-    this.positionBuffer = [{ x, z, timestamp: Date.now() }];
+    this.mesh.position.set(this.initialX, 0.25, this.initialZ);
+
+    this.positionBuffer = [
+      {
+        x: this.initialX,
+        z: this.initialZ,
+        timestamp: Date.now(),
+      },
+    ];
+
     this.lastUpdateTime = Date.now();
-    this.velocity = new THREE.Vector3();
+    this.velocity = new THREE.Vector3(0, 0, 0);
+    this.isLocalPlayer = isLocalPlayer;
   }
 
   addPosition(x, z, timestamp) {
@@ -18,14 +35,28 @@ export default class Player {
     this.lastUpdateTime = timestamp;
 
     // Immediately update the mesh position for the local player
-    if (this.id === userId) {
+    if (this.isLocalPlayer) {
       this.mesh.position.set(x, 0.25, z);
     }
   }
 
+  setVelocity(x, z) {
+    this.velocity.set(
+      Number.isFinite(x) ? x : 0,
+      0,
+      Number.isFinite(z) ? z : 0
+    );
+  }
+
   updatePosition(deltaTime) {
-    this.mesh.position.x += this.velocity.x * deltaTime;
-    this.mesh.position.z += this.velocity.z * deltaTime;
+    if (!Number.isFinite(deltaTime)) return;
+
+    const newX = this.mesh.position.x + this.velocity.x * deltaTime;
+    const newZ = this.mesh.position.z + this.velocity.z * deltaTime;
+
+    if (Number.isFinite(newX) && Number.isFinite(newZ)) {
+      this.mesh.position.set(newX, 0.25, newZ);
+    }
   }
 
   interpolate(renderTime) {
